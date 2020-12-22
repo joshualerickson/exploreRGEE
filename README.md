@@ -117,10 +117,10 @@ use the `id` argument so that it knows what to give each reduction to.
 **CAUTION** this is an expensive function and can take awhile (reason
 why we are only showing ‘2000’ to ‘2019’) if you are trying to get a
 time series for let’s say landsat or daily PRISM or 30 year NPP. In
-future developments I’ll try and add the `bestEffort = TRUE' argument
-and`maxPixels`or map() in a more effiecient way but for now just up the
-scale like below or just split your query into chunks and`rbind\` after
-processing like below as well.
+future developments I’ll try and add the `bestEffort = TRUE` argument
+and `maxPixels` or map() in a more effiecient way but for now just up
+the scale like below or just split your query into chunks and `rbind`
+after processing like below as well.
 
 ``` r
 npp1 <- band_NPP(lincoln_county, wb = "HUC08", startDate = '2010-01-01', endDate = '2019-01-01', scale = 800)

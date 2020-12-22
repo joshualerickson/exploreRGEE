@@ -1,0 +1,27 @@
+Package: exploreRGEE
+Title: Explores Google Earth Engine.
+Version: 0.1
+Authors@R: 
+    person(given = "Josh",
+           family = "Erickson",
+           role = c("aut", "cre"),
+           email = "joshualerickson@gmail.com")
+Description: This package uses rgee and other spatial packages (sf, leaflet) to explore Google Earth Engine collections in a exploratory data analysis manner relatively quickly while using R.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    rgee,
+    dplyr,
+    tidyr,
+    leaflet,
+    ggplot2,
+    sf,
+    AOI,
+    plyr,
+    leafem,
+    magrittr,
+    stringr,
+    lubridate

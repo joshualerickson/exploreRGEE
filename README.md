@@ -75,8 +75,9 @@ viz_NPP(lincoln_county, startDate = '1986-01-01', endDate = '2016-01-01')
 <br>
 
 Also, as a default six stats will be available as **below**.  
-<br> ![](D:/R_folder/R/Random/exploreRGEE/npp_print.png)
-![](D:/R_folder/R/Random/exploreRGEE/npp.png)
+<br>
+<img src="D:/R_folder/R/Random/exploreRGEE/npp_print.png" width="20%" />
+<img src="D:/R_folder/R/Random/exploreRGEE/npp.png" width="100%" />
 
 As you can see our median is 5,215 of annual \(\frac{kg*C}{m^2}\). We
 can then mask out all the values below this threshold to see where these
@@ -88,7 +89,7 @@ as below.
 viz_NPP(lincoln_county, startDate = '1986-01-01', endDate = '2016-01-01', window = TRUE, w.low = 5215, w.high = 8356)
 ```
 
-![](D:/R_folder/R/Random/exploreRGEE/npp2.png)
+<img src="D:/R_folder/R/Random/exploreRGEE/npp2.png" width="100%" />
 
 Ok, now that we’ve got an idea of the area let’s see what it would look
 like if we reduced this area of interest by watershed. To do that we’ll
@@ -104,7 +105,8 @@ the left `<-` or right `->` operator.
 rr_NPP(lincoln_county, wb = "HUC08", startDate = '1986-01-01', endDate = '2016-01-01')
 ```
 
-<br> ![](D:/R_folder/R/Random/exploreRGEE/npp3.png)
+<br>
+<img src="D:/R_folder/R/Random/exploreRGEE/npp3.png" width="100%" />
 
 Finally, maybe we want to see how these regions have looked over time
 and not as static statistics? Well, we can use the `band_NPP()` function
@@ -140,4 +142,5 @@ npp_ts %>% ggplot(aes(Date, value, color = ID)) +
       facet_wrap(~ID)
 ```
 
-<br> ![](D:/R_folder/R/Random/exploreRGEE/npp4.png)
+<br>
+<img src="D:/R_folder/R/Random/exploreRGEE/npp4.png" width="100%" />

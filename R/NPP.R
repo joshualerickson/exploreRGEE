@@ -148,9 +148,9 @@ viz_NPP <- function(aoi, startDate = '1986-01-01', endDate = '2019-01-01',
 #'
 
 rr_NPP <- function(aoi, wb,
-                       startDate = "1986-01-01",
-                       endDate = "2019-01-01",
-                       leaflet = TRUE, scale = 250, crs = 4326){
+                           startDate = "1986-01-01",
+                           endDate = "2019-01-01",
+                           leaflet = TRUE, scale = 250, crs = 4326){
 
   if(missing(aoi)){stop("Need aoi to use this function")}
   if(missing(aoi) & missing(wb)){stop("Need at least aoi or wb with argument to use this function")}
@@ -226,45 +226,11 @@ rr_NPP <- function(aoi, wb,
     scale = scale
   )
 
-  #reglist <- stats$getInfo()$features
-
-  #region_df <- data.frame()
-
-  # for(i in 1:length(reglist)) {
-  #
-  #   it_stat <- reglist[[i]]$properties %>% flatten() %>% as.data.frame()
-  #   it_stat <- it_stat %>% dplyr::slice(1)
-  #   it_geo <- reglist[[i]]$geometry %>% as.data.frame() %>%
-  #     dplyr::mutate(coords = c('lat', 'lon')) %>%
-  #     dplyr::relocate(coords) %>% dplyr::select(-type)
-  #
-  #   it_geo <-  t(it_geo)
-  #
-  #   rownames(it_geo) <- NULL
-  #
-  #   it_geo <- it_geo %>% as.data.frame() %>%
-  #     dplyr::slice(-1) %>% dplyr::rename(lat = 'V1', lon = 'V2')
-  #
-  #   if(reglist[[1]]$geometry$type != "Point"){
-  #     it_geo <- it_geo %>%
-  #       sf::st_as_sf(coords = c("lat", "lon"), crs = crs) %>%
-  #       dplyr::summarise(geometry = sf::st_combine(geometry)) %>%
-  #       sf::st_cast("POLYGON")
-  #   } else {
-  #     it_geo <- it_geo %>%
-  #       sf::st_as_sf(coords = c("lat", "lon"), crs = crs)
-  #   }
-  #
-  #   it_region <- dplyr::bind_cols(it_stat, it_geo)
-  #
-  #   region_df <- plyr::rbind.fill(region_df, it_region)
-  # }
-
   region_df <- rgee::ee_as_sf(stats)
 
   region_df <- region_df %>%
     dplyr::mutate(param = 'Annual NPP',year_range = paste0(stringr::str_remove(startDate,"(-).*"), " - ", stringr::str_remove(endDate,"(-).*"))) %>%
-    dplyr::mutate(dplyr::across(c('max', 'mean', 'median', 'min','stdDev', 'sum'), as.numeric))
+  dplyr::mutate(dplyr::across(c('max', 'mean', 'median', 'min','stdDev', 'sum'), as.numeric))
 
   if(leaflet == "TRUE") {
 
@@ -307,6 +273,101 @@ rr_NPP <- function(aoi, wb,
   return(region_df)
 
 }
+
+
+
+#' #' Get Landsat Reduced Regions
+#' #' @description This function uses NPP and any sf object or USGS Watershed Boundary Dataset of Basins to
+#' #' reduce regions to commmon statistics: mean, max, min, median, stdDev and sum for selected date ranges.
+#' #' @param aoi A sf object.
+#' #' @param wb A \code{character} of HUC id, e.g. HUC02-HUC12.
+#' #' @param startDate \code{character} format date, e.g. "1999-10-23"
+#' #' @param endDate \code{character} format date, e.g. "1999-10-23"
+#' #' @param leaflet \code{logical} indicating to view leaflet map. default (TRUE)
+#' #' @param scale \code{numeric} value indicating what to reduce the regions by, e.g. 250 (m) default.
+#' #' @param crs \code{numeric}
+#' #' @return An sf object.
+#' #'
+#' #' @importFrom dplyr across
+#' #'
+#'
+#' rr_NPP <- function(aoi, wb,
+#'                            startDate = "1986-01-01",
+#'                            endDate = "2019-01-01",
+#'                            leaflet = TRUE, scale = 250, crs = 4326){
+#'
+#'
+#'   j <- round(nrow(aoi)/500,0)
+#'
+#'   if(j > 1){
+#'
+#'     sf_obj <- data.frame()
+#'
+#'     for(i in 1:j){
+#'
+#'       chunks <- aoi %>%
+#'         group_by((row_number()-1) %/% (n()/j)) %>%
+#'         nest %>% pull(data)
+#'
+#'       obj <- chunks[[i]] %>% rr_NPP(leaflet = FALSE)
+#'
+#'       sf_obj <- plyr::rbind.fill(obj, sf_obj)
+#'
+#'     }
+#'
+#'     region_df = sf_obj %>% st_as_sf()
+#'
+#'     if(leaflet == "TRUE") {
+#'
+#'       if(class(region_df$geometry[[1]])[[2]] != "POINT") {
+#'         ldPal <- leaflet::colorNumeric("RdYlGn", region_df$mean)
+#'         plot <-  viz_A() %>% leaflet::addPolygons(data = region_df, color = "black",
+#'                                                   fillOpacity = .75,
+#'                                                   fillColor = ~ldPal(mean),
+#'                                                   popup = paste0("<b>", "Parameter: ", "</b>","Annual NPP",
+#'                                                                  "<br>", "<b>", "Date Range: ", "</b>",paste0("Years: ",stringr::str_remove(startDate,"(-).*"), " - ", stringr::str_remove(endDate,"(-).*")),
+#'                                                                  "<br>", "<b>", "Maximum: ", "</b>",round(region_df$max,3),
+#'                                                                  "<br>", "<b>", "Minimum: ", "</b>",round(region_df$min,3),
+#'                                                                  "<br>", "<b>", "Mean: ", "</b>",round(region_df$mean,3),
+#'                                                                  "<br>", "<b>", "Median: ", "</b>",round(region_df$median,3),
+#'                                                                  "<br>", "<b>", "Standard Deviation: ", "</b>",round(region_df$stdDev,3),
+#'                                                                  "<br>", "<b>", "Sum: ", "</b>",round(region_df$sum,3),
+#'                                                                  "<br>",
+#'                                                                  '<a href = "http://www.ntsg.umt.edu/files/modis/MOD17UsersGuide2015_v3.pdf"> More Info </a>'))
+#'
+#'         print(plot)
+#'
+#'       } else {
+#'
+#'         ldPal <- leaflet::colorNumeric("RdYlGn", region_df$mean)
+#'         plot <-  viz_A() %>% leaflet::addCircleMarkers(data = region_df, color = "black",
+#'                                                        fillOpacity = .75,
+#'                                                        fillColor = ~ldPal(mean),
+#'                                                        popup = paste0("<b>", "Parameter: ", "</b>","Annual NPP",
+#'                                                                       "<br>", "<b>", "Date Range: ", "</b>",paste0("Years: ",stringr::str_remove(startDate,"(-).*"), " - ", stringr::str_remove(endDate,"(-).*")),
+#'                                                                       "<br>", "<b>", "Value: ", "</b>",round(region_df$mean,3),
+#'                                                                       "<br>",
+#'                                                                       '<a href = "http://www.ntsg.umt.edu/files/modis/MOD17UsersGuide2015_v3.pdf"> More Info </a>'))
+#'
+#'
+#'         print(plot)
+#'       }
+#'
+#'     }
+#'
+#'     return(region_df)
+#'   } else {
+#'
+#'   rr_NPP_scaffle(aoi = aoi, startDate = startDate, endDate = endDate,
+#'                  scale = scale, crs = crs, leaflet = leaflet)
+#'
+#'   }
+#' }
+
+
+
+
+
 
 #' Extract Regions by Date
 #' @description This function is similar to \link[exploreRGEE]{rr_NPP} but instead of reducing the region

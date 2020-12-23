@@ -68,7 +68,7 @@ viz_Landsat <- function(aoi, param = "NDVI", startDate = '1984-04-01', endDate =
 
   col_med <- collection$median()
 
-  col_med <- col_med$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'nd', 'nd_1'), c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'NDVI', 'NDWI'))
+  #col_med <- col_med$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'nd', 'nd_1'), c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'NDVI', 'NDWI'))
 
   col_med <- col_med$select(param)
 
@@ -245,7 +245,7 @@ rr_Landsat <- function(aoi, wb, param = 'NDVI',
 
   col_med <- collection$median()
 
-  col_med <- col_med$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'nd', 'nd_1'), c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'NDVI', 'NDWI'))
+  #col_med <- col_med$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'nd', 'nd_1'), c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'NDVI', 'NDWI'))
 
 col_med <- col_med$select(param)
     #get stats
@@ -426,7 +426,7 @@ band_Landsat <- function(aoi, wb, id,
   collection <- collection$filter(calRange)
 collection <- collection$filterDate(startDate, endDate)
 
-  collection <- collection$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'nd', 'nd_1'), c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'NDVI', 'NDWI'))
+  #collection <- collection$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'nd', 'nd_1'), c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa', 'NDVI', 'NDWI'))
 
   collection <- collection$select(param)
 

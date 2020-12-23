@@ -49,7 +49,7 @@ viz_Landsat <- function(aoi, param = "NDVI", startDate = '1986-04-01', endDate =
 
   # Filter collections and prepare them for merging.
   oliCol = oliCol$filter(colFilter)$map(prepOli)
-  etmCol = etmCol$filter(colFilter)$map(prepEtm)
+  #etmCol = etmCol$filter(colFilter)$map(prepEtm)
   tmCol = tmCol$filter(colFilter)$map(prepEtm)
 
   #Merge the collections.

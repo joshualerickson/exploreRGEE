@@ -624,6 +624,7 @@ if(class(region_df$geometry[[1]])[[2]] != "POINT") {
 #' @param c.low \code{numeric} lower month value for calendar range
 #' @param c.high \code{numeric} higher month value for calendar range
 #' @param plot \code{logical} TRUE/FALSE.
+#' @param save.plot \code{logical} TRUE/FALSE. Whether to save the plot in a list, e.g. data + ggplot.
 #' @param scale \code{numeric} value indicating what to reduce the regions by, e.g. 800 (m) default.
 #' @param crs \code{numeric} crs value
 #' @note Might change this function in the future by using map() server-side to speed up computations. Better with points or centroids of polygons.
@@ -635,7 +636,7 @@ if(class(region_df$geometry[[1]])[[2]] != "POINT") {
 band_PRISM <- function(aoi,id,  wb,  method = "AN81m",
                        param = 'ppt', startDate = "1981-01-01",
                        endDate = "2010-01-01",c.low = 1, c.high = 12,
-                       plot = TRUE, save.plot = "FALSE", scale = 800,
+                       plot = TRUE, save.plot = FALSE, scale = 800,
                        crs = 4326) {
 
   if(missing(aoi)){stop("Need aoi to use this function")}

@@ -7,7 +7,7 @@
 viz_Landsat(
   aoi,
   param = "NDVI",
-  startDate = "1984-04-01",
+  startDate = "1986-04-01",
   endDate = "2020-10-30",
   window = FALSE,
   w.low = NULL,

@@ -17,7 +17,7 @@
 #' @export
 #'
 #' @examples
-viz_Landsat <- function(aoi, param = "NDVI", startDate = '1984-04-01', endDate = '2020-10-30',
+viz_Landsat <- function(aoi, param = "NDVI", startDate = '1986-04-01', endDate = '2020-10-30',
                         window = FALSE, w.low = NULL, w.high = NULL, c.low = 1, c.high = 12, scale = 250){
 
   bb <-  sf::st_bbox(aoi)
@@ -72,7 +72,7 @@ viz_Landsat <- function(aoi, param = "NDVI", startDate = '1984-04-01', endDate =
 
   col_med <- col_med$select(param)
 
-  cen <- as.numeric(AOI::bbox_coords({{aoi}}))
+  cen <- as.numeric(AOI::bbox_coords(aoi))
   Map$setCenter(cen[1], cen[2], 7)
 
   GetURL <- function(service, host = "basemap.nationalmap.gov") {

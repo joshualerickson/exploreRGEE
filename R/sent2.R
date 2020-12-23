@@ -99,7 +99,7 @@ mLayer@map %>%
                        group = grp, options = opt, layers = "0") %>%
   leaflet::addLayersControl(baseGroups = c("Topo","CartoDB.Positron", "CartoDB.DarkMatter",
                                            "OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap"),
-                            overlayGroups = c(paste0("Landsat: ", param, "; " , startDate, " - ", endDate), grp))
+                            overlayGroups = c(paste0("Sentinel 2: ", param, "; " , startDate, " - ", endDate), grp))
   } #end curly
 
 

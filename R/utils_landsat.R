@@ -14,7 +14,7 @@ renameEtm = function(img) {
 # Function to convert etm to oli using coefficients
 
 
-etmToOli = ee_utils_pyfunc(function(img) {
+etmToOli = rgee::ee_utils_pyfunc(function(img) {
   coefficients = list(
     itcps = ee$Image$constant(c(0.0003, 0.0088, 0.0061, 0.0412, 0.0254, 0.0172))$multiply(10000),
     slopes = ee$Image$constant(c(0.8474, 0.8483, 0.9047, 0.8462, 0.8937, 0.9071))

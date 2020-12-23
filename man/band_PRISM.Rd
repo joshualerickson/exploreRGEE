@@ -15,7 +15,7 @@ band_PRISM(
   c.low = 1,
   c.high = 12,
   plot = TRUE,
-  save.plot = "FALSE",
+  save.plot = FALSE,
   scale = 800,
   crs = 4326
 )
@@ -40,6 +40,8 @@ band_PRISM(
 \item{c.high}{\code{numeric} higher month value for calendar range}
 
 \item{plot}{\code{logical} TRUE/FALSE.}
+
+\item{save.plot}{\code{logical} TRUE/FALSE. Whether to save the plot in a list, e.g. data + ggplot.}
 
 \item{scale}{\code{numeric} value indicating what to reduce the regions by, e.g. 800 (m) default.}
 

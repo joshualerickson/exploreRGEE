@@ -19,7 +19,7 @@ etmToOli = rgee::ee_utils_pyfunc(function(img) {
     itcps = ee$Image$constant(c(0.0003, 0.0088, 0.0061, 0.0412, 0.0254, 0.0172))$multiply(10000),
     slopes = ee$Image$constant(c(0.8474, 0.8483, 0.9047, 0.8462, 0.8937, 0.9071))
   )
-  img = img$select(list('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2'))$multiply(ee$Image(coefficients$slopes))$add(coefficients$itcps)$round()$toShort()$addBands(img$select('pixel_qa'))
+  img = img$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2'))$multiply(ee$Image(coefficients$slopes))$add(coefficients$itcps)$round()$toShort()$addBands(img$select('pixel_qa'))
 
   return(img)
 })
@@ -41,8 +41,8 @@ addNDWI = function(image) {
 
 
 fmask = function(img) {
-  cloudShadowBitMask = bitwShiftL(1,3)
-  cloudsBitMask = bitwShiftL(1,5)
+  cloudShadowBitMask = base::bitwShiftL(1,3)
+  cloudsBitMask = base::bitwShiftL(1,5)
   qa = img$select('pixel_qa')
   mask = qa$bitwiseAnd(cloudShadowBitMask)$eq(0)$And(qa$bitwiseAnd(cloudsBitMask)$eq(0))
 

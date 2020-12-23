@@ -14,7 +14,7 @@ renameEtm = function(img) {
 # Function to convert etm to oli using coefficients
 
 
-etmToOli = rgee::ee_utils_pyfunc(function(img) {
+etmToOli = function(img) {
   coefficients = list(
     itcps = ee$Image$constant(c(0.0003, 0.0088, 0.0061, 0.0412, 0.0254, 0.0172))$multiply(10000),
     slopes = ee$Image$constant(c(0.8474, 0.8483, 0.9047, 0.8462, 0.8937, 0.9071))
@@ -22,7 +22,7 @@ etmToOli = rgee::ee_utils_pyfunc(function(img) {
   img = img$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2'))$multiply(ee$Image(coefficients$slopes))$add(coefficients$itcps)$round()$toShort()$addBands(img$select('pixel_qa'))
 
   return(img)
-})
+}
 
 # This function gets NDVI to landsat.
 

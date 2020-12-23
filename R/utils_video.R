@@ -3,13 +3,13 @@
 #' Visualise NDVI
 #'
 #' @param aoi
+#' @param collection
 #' @param startDate
 #' @param endDate
 #'
-#' @return
+#' @return A gif video.
 #'
-#' @examples
-get_Video <- function(aoi,collection = "MOD13", param = NULL, startDate = '2018-01-01', endDate = '2019-01-01'){
+get_Video <- function(aoi, collection = "MOD13", param = NULL, startDate = '2018-01-01', endDate = '2019-01-01'){
 
   if(collection == "MOD13"){
   col = ee$ImageCollection('MODIS/006/MOD13A2')$select('NDVI')
@@ -86,7 +86,7 @@ gifParams = list(
 
 #Print the GIF URL to the console.
 print(rgbVis$getVideoThumbURL(gifParams))
-browseURL(rgbVis$getVideoThumbURL(gifParams))
+utils::browseURL(rgbVis$getVideoThumbURL(gifParams))
 
 }
 

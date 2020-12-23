@@ -39,7 +39,7 @@ get_diff(
 \item{scale}{\code{numeric} value indicating what to reduce the regions by, e.g. 250 (m) default.}
 }
 \value{
-
+A leaflet map.
 }
 \description{
 Title

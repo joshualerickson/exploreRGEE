@@ -12,11 +12,11 @@
 #' @param c.low \code{numeric} lower month value for calendar range
 #' @param c.high \code{numeric} higher month value for calendar range
 #' @param scale \code{numeric} value indicating what to reduce the regions by, e.g. 250 (m) default.
-#' @return
+#' @return A leaflet map
 #' @export
 #'
 #' @examples
-viz_Sent2 <- function (aoi, param = "nd", startDate = '2015-04-01', endDate = '2020-10-30',
+viz_Sent2 <- function (aoi, param = "NDVI", startDate = '2015-04-01', endDate = '2020-10-30',
                        window = FALSE, w.low = NULL, w.high = NULL, c.low = 1, c.high = 12, scale = 250) {
 
 
@@ -41,13 +41,16 @@ viz_Sent2 <- function (aoi, param = "nd", startDate = '2015-04-01', endDate = '2
   )
 
   s2 <- ee$ImageCollection('COPERNICUS/S2')$filterBounds(geom)
+
   calRange = ee$Filter$calendarRange(c.low,c.high, 'month')
+
   s2 = s2$filter(calRange)
+
   s2 = s2$filterDate(startDate, endDate)
 
   s2 = s2$map(maskcloud1)
 
-  s2 = s2$map(addNDVI)
+  s2 = s2$map(addNDVIsent)
 
 s2 = s2$map(addNDWIsent)
 
@@ -82,7 +85,7 @@ GetURL <- function(service, host = "basemap.nationalmap.gov") {
 
 grp = "Hydrography"
 opt <- leaflet::WMSTileOptions(format = "image/png", transparent = TRUE)
-mLayer <- Map$addLayer(s2$select(param)$clip(geom),
+mLayer <- Map$addLayer(s2$clip(geom),
                        visParams = list(min = st_min, max = st_max, palette = c(
                          "#d73027", "#f46d43", "#fdae61",
                          "#fee08b", "#d9ef8b", "#a6d96a",

@@ -15,7 +15,6 @@
 #' @param c.low \code{numeric} lower month value for calendar range
 #' @param c.high \code{numeric} higher month value for calendar range
 #' @param scale \code{numeric} indicating in meters what to scale the statistics by, e.g. min/max.
-#' @return
 
 #'
 #' @examples

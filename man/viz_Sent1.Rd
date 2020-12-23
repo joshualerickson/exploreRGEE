@@ -27,9 +27,6 @@ viz_Sent1()
 
 \item{scale}{\code{numeric} indicating in meters what to scale the statistics by, e.g. min/max.}
 }
-\value{
-
-}
 \description{
 The Sentinel-1 mission provides data from a
 dual-polarization C-band Synthetic Aperture Radar (SAR) instrument.

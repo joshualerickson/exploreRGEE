@@ -16,7 +16,7 @@ get_Video(
 \item{endDate}{}
 }
 \value{
-
+A gif video.
 }
 \description{
 Visualise NDVI

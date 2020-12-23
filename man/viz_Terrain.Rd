@@ -36,7 +36,7 @@ viz_Terrain(
 \item{scale}{\code{numeric} value indicating what to reduce the regions by, e.g. 10 (m) default.}
 }
 \value{
-
+A leaflet map.
 }
 \description{
 This function takes the USGS NED layer and generates a handfull of terrain visualizations. This is good for

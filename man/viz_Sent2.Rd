@@ -6,7 +6,7 @@
 \usage{
 viz_Sent2(
   aoi,
-  param = "nd",
+  param = "NDVI",
   startDate = "2015-04-01",
   endDate = "2020-10-30",
   window = FALSE,
@@ -39,7 +39,7 @@ viz_Sent2(
 \item{scale}{\code{numeric} value indicating what to reduce the regions by, e.g. 250 (m) default.}
 }
 \value{
-
+A leaflet map
 }
 \description{
 Sentinel-2 MSI: MultiSpectral Instrument, Level-1C

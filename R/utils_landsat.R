@@ -1,24 +1,18 @@
 
 
-#' Function to get and rename bands of interest from OLI.
-#'
-#' @param img
+# Function to get and rename bands of interest from OLI.
 
 renameOli = function(img) {
   img$select(c('B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'pixel_qa'),c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa'))
 }
 
-#' Function to get and rename bands of interest from ETM+.
-#'
-#' @param img
-
+# Function to get and rename bands of interest from ETM+.
 renameEtm = function(img) {
   img$select(c('B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'pixel_qa'),c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa'))
 }
 
-#' Function to convert etm to oli using coefficients
-#'
-#' @param img
+# Function to convert etm to oli using coefficients
+
 
 etmToOli = ee_utils_pyfunc(function(img) {
   coefficients = list(
@@ -30,27 +24,21 @@ etmToOli = ee_utils_pyfunc(function(img) {
   return(img)
 })
 
-#'This function gets NDVI to landsat.
-#'
-#' @param image
-#'
+# This function gets NDVI to landsat.
 
 addNDVI = function(image) {
   return(image$addBands(image$normalizedDifference(c('NIR', 'Red'))))
 }
 
-#' This function gets NDWI for landsat.
-#'
-#' @param image
-#'
+# This function gets NDWI for landsat.
+
 
 addNDWI = function(image) {
   return(image$addBands(image$normalizedDifference(c('Green', 'NIR'))))
 }
 
-#' Mask out bad pixels (cloud masker)
-#'
-#' @param img
+# Mask out bad pixels (cloud masker)
+
 
 fmask = function(img) {
   cloudShadowBitMask = bitwShiftL(1,3)
@@ -61,9 +49,8 @@ fmask = function(img) {
   return(img$updateMask(mask))
 }
 
-#' Define function to prepare OLI images.
-#'
-#' @param img
+# Define function to prepare OLI images.
+
 
 prepOli = function(img) {
   orig = img
@@ -75,10 +62,8 @@ prepOli = function(img) {
   return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
 }
 
-#' Define function to prepare ETM+ images.
-#' Title
-#'
-#' @param img
+# Define function to prepare ETM+ images.
+
 
 prepEtm = function(img) {
   orig = img
@@ -92,37 +77,31 @@ prepEtm = function(img) {
 }
 
 
-#' sent2 ndwi
-#' @param image
-#'
+# sent2 ndwi
+
 
 addNDWIsent = function(image){
   return(image$addBands(image$normalizedDifference(c('B3', 'B8'))))
 }
 
-#' sent2 ndvi
-#' @param image
+# sent2 ndvi
+
 
 addNDVIsent = function(image){
   return(image$addBands(image$normalizedDifference(c('B8', 'B4'))))
 }
 
 
-#' Function to mask cloud from built-in quality band
-#' information on cloud
-#'
-#' @param image
-#'
+# Function to mask cloud from built-in quality band
+# information on cloud
 
 maskcloud1 = function(image) {
   QA60 = image$select('QA60')
   return(image$updateMask(QA60$lt(1)))
 }
 
-#' Mask cloud for NPP
-#'
-#' @param image
-#'
+# Mask cloud for NPP
+
 maskcloud_npp = function(image) {
   QC255 = image$select('QC')
   return(image$updateMask(QC255$lt(255)))

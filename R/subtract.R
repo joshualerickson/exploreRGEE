@@ -13,10 +13,9 @@
 #' @param c.high \code{numeric} higher month value for calendar range
 #' @param scale \code{numeric} value indicating what to reduce the regions by, e.g. 250 (m) default.
 #'
-#' @return
+#' @return A leaflet map.
 #' @export
-#'
-#' @examples
+
 get_diff <- function(aoi,method = "LANDSAT", param = "NDVI", startDate = '2000-01-01', endDate = '2010-12-30',startDate2 = '2010-01-01', endDate2 = '2020-10-30',
                      c.low = 1, c.high = 12, scale = 250){
 bb <-  sf::st_bbox(aoi)

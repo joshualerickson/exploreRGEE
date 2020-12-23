@@ -1,5 +1,5 @@
 Package: exploreRGEE
-Title: Explores Google Earth Engine.
+Title: Explores Google Earth Engine
 Version: 0.1
 Authors@R: 
     person(given = "Josh",
@@ -24,4 +24,5 @@ Imports:
     leafem,
     magrittr,
     stringr,
-    lubridate
+    lubridate,
+    utils

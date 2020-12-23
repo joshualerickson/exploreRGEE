@@ -11,7 +11,7 @@
 #' @param az \code{numeric} The illumination azimuth in degrees from north. o
 #' @param el \code{numeric} The illumination elevation in degrees. optional
 #' @param scale \code{numeric} value indicating what to reduce the regions by, e.g. 10 (m) default.
-#' @return
+#' @return A leaflet map.
 #' @export
 #'
 

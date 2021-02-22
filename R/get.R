@@ -17,6 +17,7 @@
 #' @param c.high \code{numeric} higher month value for calendar range
 #' @note I'm hoping to make this one more dynamic with importing \href{https://github.com/davemlz/eemont}{#eemont} functions. Also, 'harm_ts' can take a long time to process so be aware!
 #' @return A list of Earth Engine Objects and arguments.
+#' @details
 #' The methods currently available (more to come):
 #' \itemize{
 #' \item  \strong{harm_ts}: Harmonizing Landsat Missions; 1984-01-01 - 2021-01-22.

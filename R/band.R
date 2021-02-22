@@ -177,7 +177,7 @@ getting_proc <- function(data, proc, param_name, method){
 
   if(class(data) == 'met_list'){
 
-if(method == "AN81m"){
+if(method == "AN81m" | method == "TERRACLIMATE"){
 
   proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, "X"),
                                  Date = stringr::str_remove_all(.data$Date, param_name),
@@ -191,6 +191,27 @@ if(method == "AN81m"){
                                  Date = stringr::str_remove_all(.data$Date,param_name),
                                  Date = stringr::str_replace(.data$Date,"(\\d{4})", "\\1-"),
                                  Date = lubridate::as_date(.data$Date))
+
+} else if (method == 'TRMMh'){
+
+  proc <- proc %>% dplyr::mutate(Date = str_remove_all(.data$Date, 'X'),
+              Date = stringr::str_remove_all(.data$Date, param_name),
+              Date = stringr::str_sub(.data$Date, start = 6),
+              Date = stringr::str_sub(.data$Date, end = -3),
+              Date = stringr::str_replace_all(.data$Date, "_", " "),
+              Date = stringr::str_replace(.data$Date, "(\\d{6})", "\\1-"),
+              Date = stringr::str_replace(.data$Date, "(\\d{4})", "\\1-"),
+              Date = paste0(.data$Date, "00"),
+              Date = lubridate::parse_date_time2(.data$Date, orders = '%Y/%m/%d %H:%M'))
+
+} else if (method == 'TRMMm'){
+
+  proc <- proc %>% dplyr::mutate(Date = str_remove_all(.data$Date, 'X'),
+                                 Date = stringr::str_remove_all(.data$Date, param_name),
+                                 Date = stringr::str_sub(.data$Date, start = 6),
+                                 Date = stringr::str_sub(.data$Date, end = -3),
+                                 Date = lubridate::as_date(Date)
+                                 )
 
 }
   } else if (class(data) == 'landsat_list'){

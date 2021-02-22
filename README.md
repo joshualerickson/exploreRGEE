@@ -113,11 +113,10 @@ npp %>% rr(scale = 250, leaflet = TRUE)
 <br> Maybe we want to see how this region looked over time and not as
 static statistics? Well, we can use the `band()` function to do this.
 This function takes each year and `toBands()` the ImageCollection. From
-there, using [rgee](https://github.com/r-spatial/rgee) `ee_extract()` we
-can then convert to table values. This is an expensive function and you
-can use `lazy = TRUE`. This will split the object into 10 groups and run
-a for loop in the background in sequential. Future developments will
-hopefully make this parallel.
+there, using rgee `ee_extract()` we can then convert to table values.
+This is an expensive function and you can use `lazy = TRUE`. This will
+split the object into 10 groups and run a for loop in the background in
+sequential. Future developments will hopefully make this parallel.
 
 ``` r
 

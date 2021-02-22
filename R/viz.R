@@ -62,7 +62,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
 
     }
 
-    if(length(param) > 1 | isTRUE(class(data) == 'diff_list')){
+    if(isTRUE(length(param) > 1) | isTRUE(class(data) == 'diff_list')){
 
       id_tag <- paste0(method, ' - ',stat, "; " ,startDate, " - ", endDate)
 
@@ -147,11 +147,12 @@ leaf_call <- function(data, geom, min, max, palette, id_tag, bbox, reverse, n_pa
 
 if(isTRUE(class(data) == 'diff_list')){
 
-  mLayer <- rgee::Map$addLayer(data$clip(geom), visParams = list(bands = bands, min = min, max = max, gamma = gamma), id_tag, opacity = opacity)
+
+  mLayer <- rgee::Map$addLayer(data$clip(geom)$sldStyle(sld_intervals(data, bands)), visParams = list(), id_tag, opacity = opacity)
 
 } else {
 
-  mLayer <- rgee::Map$addLayer(data$clip(geom)$sldStyle(sld_intervals(data, bands)), visParams = list(), id_tag, opacity = opacity)
+  mLayer <- rgee::Map$addLayer(data$clip(geom), visParams = list(bands = bands, min = min, max = max, gamma = gamma), id_tag, opacity = opacity)
 
 }
 
@@ -179,7 +180,7 @@ mLayer
 sld_intervals <- function(data, param){
 
 
-    if(param %in% c("ppt", "pr", "prcp", "precipitation", 'annualNPP')){
+    if(isTRUE(class(data) == 'met_list')){
   paste0(
     "<RasterSymbolizer>",
     '<ColorMap  type="ramp" extended="false" >',

@@ -62,7 +62,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
 
     }
 
-    if(length(param) > 1 | class(data) == 'diff_list'){
+    if(length(param) > 1 | isTRUE(class(data) == 'diff_list')){
 
       id_tag <- paste0(method, ' - ',stat, "; " ,startDate, " - ", endDate)
 

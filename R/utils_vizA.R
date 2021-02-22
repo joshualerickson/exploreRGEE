@@ -2,7 +2,6 @@
 #' Leaflet with USGS basemaps
 #'
 #' @return A leaflet map with USGS basemaps
-#' @import ggplot2
 #' @examples
 viz_A <- function() {
 

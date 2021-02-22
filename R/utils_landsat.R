@@ -27,19 +27,24 @@ etmToOli = function(img) {
 # This function gets NDVI to landsat.
 
 addNDVI = function(image) {
-  return(image$addBands(image$normalizedDifference(c('NIR', 'Red'))))
+  return(image$addBands(image$normalizedDifference(c('NIR', 'Red'))$rename('NDVI')))
 }
 
 # This function gets NDWI for landsat.
 
 
 addNDWI = function(image) {
-  return(image$addBands(image$normalizedDifference(c('Green', 'NIR'))))
+  return(image$addBands(image$normalizedDifference(c('Green', 'NIR'))$rename('NDWI')))
 }
 
+#get near burn index
+
+calcNbr = function(image) {
+  return(image$addBands(image$normalizedDifference(c('NIR', 'SWIR2'))$rename('NBR')))
+}
+
+
 # Mask out bad pixels (cloud masker)
-
-
 fmask = function(img) {
   cloudShadowBitMask = base::bitwShiftL(1,3)
   cloudsBitMask = base::bitwShiftL(1,5)
@@ -58,6 +63,7 @@ prepOli = function(img) {
   img = fmask(img)
   img = addNDVI(img)
   img = addNDWI(img)
+  img = calcNbr(img)
 
   return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
 }
@@ -72,37 +78,111 @@ prepEtm = function(img) {
   img = etmToOli(img)
   img = addNDVI(img)
   img = addNDWI(img)
+  img = calcNbr(img)
 
   return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
 }
 
+# without Roy harmonizing
+prepEtm_cloud = function(img) {
+  orig = img
+  img = renameEtm(img)
+  img = fmask(img)
+  img = addNDVI(img)
+  img = addNDWI(img)
+  img = calcNbr(img)
 
-# sent2 ndwi
-
-
-addNDWIsent = function(image){
-  return(image$addBands(image$normalizedDifference(c('B3', 'B8'))))
+  return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
 }
 
-# sent2 ndvi
+# Define function to prepare OLI images.
 
 
-addNDVIsent = function(image){
-  return(image$addBands(image$normalizedDifference(c('B8', 'B4'))))
+prepOli_raw = function(img) {
+  orig = img
+  img = renameOli(img)
+  img = addNDVI(img)
+  img = addNDWI(img)
+  img = calcNbr(img)
+  return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
+}
+
+# Define function to prepare ETM+ images.
+
+
+prepEtm_raw = function(img) {
+  orig = img
+  img = renameEtm(img)
+  img = addNDVI(img)
+  img = addNDWI(img)
+  img = calcNbr(img)
+  return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
 }
 
 
-# Function to mask cloud from built-in quality band
-# information on cloud
+# function for pre-processing landsat data
 
-maskcloud1 = function(image) {
-  QA60 = image$select('QA60')
-  return(image$updateMask(QA60$lt(1)))
+col_ld <- function(c.low, c.high, geom, startDate, endDate, method, cloud_mask){
+
+
+# Bring in image collections from landsat 5,7,8
+oliCol = ee$ImageCollection('LANDSAT/LC08/C01/T1_SR')$filterBounds(geom)
+etmCol = ee$ImageCollection('LANDSAT/LE07/C01/T1_SR')$filterBounds(geom)
+tmCol = ee$ImageCollection('LANDSAT/LT05/C01/T1_SR')$filterBounds(geom)
+ld4Col = ee$ImageCollection('LANDSAT/LT04/C01/T1_SR')$filterBounds(geom)
+colFilter = ee$Filter$lt('CLOUD_COVER', 50)$lt('GEOMETRIC_RMSE_MODEL', 10)$Or(ee$Filter$eq('IMAGE_QUALITY', 9),ee$Filter$eq('IMAGE_QUALITY_OLI', 9))
+
+if(isTRUE(cloud_mask)){
+
+  if(method == 'harm_ts'){
+# Filter collections and prepare them for merging.
+oliCol = oliCol$filter(colFilter)$map(prepOli)
+etmCol = etmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm))
+tmCol = tmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm))
+collection = ee$ImageCollection(oliCol$merge(etmCol)$merge(tmCol))
+} else {
+
+  oliCol = oliCol$filter(colFilter)$map(prepOli)
+  etmCol = etmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
+  tmCol = tmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
+  ld4Col = ld4Col$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
 }
 
-# Mask cloud for NPP
+} else {
+  oliCol = oliCol$map(prepOli_raw)
+  etmCol = etmCol$map(rgee::ee_utils_pyfunc(prepEtm_raw))
+  tmCol = tmCol$map(rgee::ee_utils_pyfunc(prepEtm_raw))
+  ld4Col = ld4Col$map(rgee::ee_utils_pyfunc(prepEtm_raw))
+}
+#Merge the collections.
 
-maskcloud_npp = function(image) {
-  QC255 = image$select('QC')
-  return(image$updateMask(QC255$lt(255)))
+if(method == 'ld8'){
+
+  collection <- oliCol
+
+} else if (method == 'ld7'){
+
+  collection <- etmCol
+
+} else if (method == 'ld5'){
+
+  collection <- tmCol
+
+} else if (method == 'ld4'){
+
+  collection <- ld4Col
+
+}
+
+#filter by cal range
+calRange = ee$Filter$calendarRange(c.low,c.high, 'month')
+
+
+collection <- collection$filter(calRange)
+
+
+collection <- collection$filterDate(startDate, endDate)
+
+
+
 }

@@ -19,10 +19,15 @@ Imports:
     leaflet,
     ggplot2,
     sf,
-    AOI,
-    plyr,
     leafem,
     magrittr,
     stringr,
     lubridate,
-    utils
+    utils,
+    rlang,
+    future,
+    RColorBrewer,
+    readr,
+    plyr
+Depends: 
+    R (>= 2.10)

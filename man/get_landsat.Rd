@@ -46,6 +46,13 @@ get_landsat(
 }
 \value{
 A list of Earth Engine Objects and arguments.
+}
+\description{
+This function gets 30-m USGS Landsat 8, 7 , 5 and 4 (Surface Reflectance Tier 1 (SR))
+satellite images from various bands. The image processing uses methods by Roy et al. (2016) and Zhu et al. (2015) (e.g. harmonization and cloud-masking) so that all three Landsat
+missions could be used for time series analysis ('harm_ts') or you can just get individual missions (see details below).
+}
+\details{
 The methods currently available (more to come):
 \itemize{
 \item  \strong{harm_ts}: Harmonizing Landsat Missions; 1984-01-01 - 2021-01-22.
@@ -54,11 +61,6 @@ The methods currently available (more to come):
 \item \strong{ld5}: LANDSAT/LC05/C01/T1_SR; 1984-01-01 - 2012-05-05.
 \item \strong{ld4}: LANDSAT/LC04/C01/T1_SR; 1982-08-22 - 1993-12-14.
 }
-}
-\description{
-This function gets 30-m USGS Landsat 8, 7 , 5 and 4 (Surface Reflectance Tier 1 (SR))
-satellite images from various bands. The image processing uses methods by Roy et al. (2016) and Zhu et al. (2015) (e.g. harmonization and cloud-masking) so that all three Landsat
-missions could be used for time series analysis ('harm_ts') or you can just get individual missions (see details below).
 }
 \note{
 I'm hoping to make this one more dynamic with importing \href{https://github.com/davemlz/eemont}{#eemont} functions. Also, 'harm_ts' can take a long time to process so be aware!

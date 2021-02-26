@@ -44,6 +44,16 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
   if(missing(data))stop({"Need a previously created get_* object as 'data'."})
 
 # dissecting the passed get_*() object
+  if(class(data)[[1]] == "ee.image.Image"){
+    image <- data
+    geom <- ee$Geometry$Rectangle(-180, -90, 180, 90)
+    method <- NULL
+    param <- NULL
+    stat <- NULL
+    startDate <- NULL
+    endDate <- NULL
+    bbox <- c(-104, 40)
+  } else {
     image <- data$data
     geom <- data$geom
     method <- data$method
@@ -52,6 +62,8 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
     startDate <- data$startDate
     endDate <- data$endDate
     bbox <- data$bbox
+  }
+
 
     if(is.null(param) & is.null(band))stop({"Need to choose a band name."})
 
@@ -134,7 +146,7 @@ Pal <- function(pal, reverse, n_pal) {
 
 leaf_call <- function(data, geom, min, max, palette, id_tag, bbox, reverse, n_pal, bands, gamma, opacity){
 
-    rgee::Map$setCenter(bbox[1], bbox[2], 7)
+    rgee::Map$setCenter(bbox[1], bbox[2], 6)
 
     GetURL <- function(service, host = "basemap.nationalmap.gov") {
       sprintf("https://%s/arcgis/services/%s/MapServer/WmsServer", host, service)

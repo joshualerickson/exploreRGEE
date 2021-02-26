@@ -640,7 +640,7 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 #'                              param = 'lossyear')
 #' }
 #'
-get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat = "median", startDate = '1984-01-01', endDate = '2020-10-30',
+get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat = "median", startDate = NULL, endDate = NULL,
                         mask = FALSE, m.low = NULL, m.high = NULL, c.low = 1, c.high = 12){
 
 
@@ -677,15 +677,20 @@ get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat 
 
   } else if (i_type == 'Image'){
 
-    data = rgee::ee$Image(method)$select(param)
+    if(!is.null(param)){
+
+      data = ee$Image(method)$select(param)
+
+    } else {
+
+      data = ee$Image(method)
+
+    }
 
   } else {
 
     stop("Need Image or ImageCollection")
   }
-
-
-
 
 
   if(mask == TRUE) {

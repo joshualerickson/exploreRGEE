@@ -164,11 +164,10 @@ mLayer
                            visParams = list(min = min, max = max, palette = Pal(palette, reverse, n_pal)), id_tag, opacity = opacity)
 }
     m1 <- mLayer %>%
-      leaflet::addWMSTiles(GetURL("USGSTopo"),
-                           group = "Topo", layers = "0") %>%
       leaflet::addWMSTiles(GetURL("USGSHydroCached"),
                            group = grp, options = opt, layers = "0") %>%
-      leaflet::addLayersControl(baseGroups = c("Topo","CartoDB.Positron", "CartoDB.DarkMatter",
+      leaflet::hideGroup(group = grp) %>%
+      leaflet::addLayersControl(baseGroups = c("CartoDB.Positron", "CartoDB.DarkMatter",
                                                "OpenStreetMap", "Esri.WorldImagery", "OpenTopoMap"),
                                 overlayGroups = c(id_tag, grp))
 }

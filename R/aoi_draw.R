@@ -2,6 +2,7 @@
 #' @description Draw an Area of Interest (AOI) interactively using a shiny app.
 #' @return An sf object.
 #' @export
+#' @importFrom shiny isolate observeEvent
 #'
 #' @examples
 aoi_draw <- function() {
@@ -9,8 +10,8 @@ aoi_draw <- function() {
 
   shiny::shinyApp(
 
-    ui = shiny::fluidPage(tags$head(
-      tags$style(HTML("
+    ui = shiny::fluidPage(shiny::tags$head(
+      shiny::tags$style(shiny::HTML("
                   .btn {
                     color: white;
                     background-color: #f44336;
@@ -25,7 +26,7 @@ aoi_draw <- function() {
                     }
 
                     "))
-    ),tabPanel("Map", style = "height:92vh;",leaflet::leafletOutput('aoi', width = "100%", height = "100%"),
+    ),shiny::tabPanel("Map", style = "height:92vh;",leaflet::leafletOutput('aoi', width = "100%", height = "100%"),
                           shiny::actionButton('clear', "Clear Map"),
                           shiny::actionButton('finish', "Finish Locations"))
     ),

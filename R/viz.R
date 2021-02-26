@@ -43,7 +43,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
 
   if(missing(data))stop({"Need a previously created get_* object as 'data'."})
 
-# dissecting the passed get_*() object
+# dissecting the passed get_*() object, not a huge fan of it but it works for now....
   if(class(data)[[1]] == "ee.image.Image"){
     image <- data
     geom <- ee$Geometry$Rectangle(-180, -90, 180, 90)
@@ -53,6 +53,18 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
     startDate <- NULL
     endDate <- NULL
     bbox <- c(-104, 40)
+
+  } else if (class(data)[[1]] == 'sf'){
+
+    image <- data$geometry
+    geom <- setup(data)
+    method <- NULL
+    param <- 'user FeatureCollection'
+    stat <- NULL
+    startDate <- NULL
+    endDate <- NULL
+    bbox <- as.numeric(sf::st_bbox(data))
+
   } else {
     image <- data$data
     geom <- data$geom
@@ -83,7 +95,14 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
 
     } else {
 
-    reducers <- rgee::ee$Reducer$min()$combine(
+      if(class(data)[[1]] == 'sf'){
+
+        id_tag <- paste0(param)
+        m1 <- rgee::Map$addLayer(rgee::sf_as_ee(data),visParams = list(), id_tag)
+
+      } else {
+
+      reducers <- rgee::ee$Reducer$min()$combine(
       reducer2 = rgee::ee$Reducer$max(),
       sharedInputs = TRUE
     )
@@ -120,7 +139,9 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
     m1 <- leaf_call(data = image, min = min, max = max, palette = palette,bands = param, id_tag = id_tag, bbox = bbox, geom = geom, reverse = reverse, n_pal = n_pal, gamma = gamma, opacity = opacity)
 
     }
-}
+      }
+
+    }
     print(m1)
 }
 

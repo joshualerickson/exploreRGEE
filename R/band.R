@@ -194,7 +194,7 @@ if(method == "AN81m" | method == "TERRACLIMATE"){
 
 } else if (method == 'TRMMh'){
 
-  proc <- proc %>% dplyr::mutate(Date = str_remove_all(.data$Date, 'X'),
+  proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, 'X'),
               Date = stringr::str_remove_all(.data$Date, param_name),
               Date = stringr::str_sub(.data$Date, start = 6),
               Date = stringr::str_sub(.data$Date, end = -3),
@@ -206,11 +206,11 @@ if(method == "AN81m" | method == "TERRACLIMATE"){
 
 } else if (method == 'TRMMm'){
 
-  proc <- proc %>% dplyr::mutate(Date = str_remove_all(.data$Date, 'X'),
+  proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, 'X'),
                                  Date = stringr::str_remove_all(.data$Date, param_name),
                                  Date = stringr::str_sub(.data$Date, start = 6),
                                  Date = stringr::str_sub(.data$Date, end = -3),
-                                 Date = lubridate::as_date(Date)
+                                 Date = lubridate::as_date(.data$Date)
                                  )
 
 }

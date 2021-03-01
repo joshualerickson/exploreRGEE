@@ -4,11 +4,36 @@
 \alias{aoi_draw}
 \title{AOI Draw}
 \usage{
-aoi_draw()
+aoi_draw(user_shape = NULL, ...)
+}
+\arguments{
+\item{user_shape}{A provided sf object to view alongside map.}
+
+\item{...}{additional arguments for mapview.}
 }
 \value{
 An sf object.
 }
 \description{
 Draw an Area of Interest (AOI) interactively using a shiny app.
+}
+\examples{
+\dontrun{
+# Load Libraries
+
+library(rgee)
+rgee::ee_intialize()
+library(exploreRGEE)
+
+huc <- exploreRGEE::huc
+
+# without providing a sf object
+
+aoi_draw()
+
+# with
+
+aoi_draw(user_shape = huc)
+}
+
 }

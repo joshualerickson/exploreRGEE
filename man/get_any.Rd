@@ -15,8 +15,8 @@ get_any(
   mask = FALSE,
   m.low = NULL,
   m.high = NULL,
-  c.low = 1,
-  c.high = 12
+  c.low = NULL,
+  c.high = NULL
 )
 }
 \arguments{

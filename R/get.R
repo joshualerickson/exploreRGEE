@@ -55,7 +55,7 @@ get_landsat <- function(aoi, method = "harm_ts", param = NULL, stat = "median", 
     aoi <- sf::st_as_sf(aoi, coords = c("clng", "clat")) %>% sf::st_set_crs(4326) %>% sf::st_transform(crs = 4326)
 
   }
-
+  aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
 
   col <- col_ld(c.low = c.low, c.high = c.high, geom = geom, startDate = startDate,
@@ -154,7 +154,7 @@ get_met <- function(aoi, method = "Norm81m", param = NULL, stat = "median", star
     aoi <- data.frame(clat = clat, clng = clng)
     aoi <- sf::st_as_sf(aoi, coords = c("clng", "clat")) %>% sf::st_set_crs(4326) %>% sf::st_transform(crs = 4326)
   }
-
+  aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
 
   colFilter <- rgee::ee$Filter$calendarRange(c.low,c.high, 'month')
@@ -235,7 +235,7 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
     aoi <- data.frame(clat = clat, clng = clng)
     aoi <- sf::st_as_sf(aoi, coords = c("clng", "clat")) %>% sf::st_set_crs(4326) %>% sf::st_transform(crs = 4326)
   }
-
+  aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
 
   s2 <- col_s2(c.low, c.high, geom, startDate, endDate, cloud_mask, method)
@@ -315,7 +315,7 @@ get_npp <- function(aoi, method = "cloud_mask", param = 'annualNPP', stat = "med
     aoi <- data.frame(clat = clat, clng = clng)
     aoi <- sf::st_as_sf(aoi, coords = c("clng", "clat")) %>% sf::st_set_crs(4326) %>% sf::st_transform(crs = 4326)
   }
-
+  aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
 
   col_med <- npp_med(geom, startDate, endDate, method)$select(param)
@@ -463,7 +463,7 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
     aoi <- data.frame(clat = clat, clng = clng)
     aoi <- sf::st_as_sf(aoi, coords = c("clng", "clat")) %>% sf::st_set_crs(4326) %>% sf::st_transform(crs = 4326)
   }
-
+  aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
   reducers <- reducers()
 
@@ -641,7 +641,7 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 #' }
 #'
 get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat = "median", startDate = NULL, endDate = NULL,
-                        mask = FALSE, m.low = NULL, m.high = NULL, c.low = 1, c.high = 12){
+                        mask = FALSE, m.low = NULL, m.high = NULL, c.low = NULL, c.high = NULL){
 
 
   if(missing(method)){stop("Need an Image/Image Collection to proceed")}
@@ -654,7 +654,7 @@ get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat 
     aoi <- sf::st_as_sf(aoi, coords = c("clng", "clat")) %>% sf::st_set_crs(4326) %>% sf::st_transform(crs = 4326)
 
   }
-
+  aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
 
   if(i_type == 'ImageCollection') {
@@ -663,9 +663,13 @@ get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat 
 
   calRange = rgee::ee$Filter$calendarRange(c.low,c.high, 'month')
 
+  if(!is.null(c.low) & !is.null(c.high)){
   col <- col$filter(calRange)
+  }
 
-  col <- col$filterDate(startDate, endDate)
+  if(!is.null(startDate) & !is.null(endDate)){
+   col <- col$filterDate(startDate, endDate)
+  }
 
   if(!is.null(param)){
 

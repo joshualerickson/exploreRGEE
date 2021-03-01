@@ -14,7 +14,8 @@ viz(
   min = NULL,
   max = NULL,
   gamma = NULL,
-  opacity = NULL
+  opacity = NULL,
+  user_shape = NULL
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ viz(
 \item{gamma}{\code{numeric} gamma correction factor.}
 
 \item{opacity}{\code{numeric} transparent display value.}
+
+\item{user_shape}{A provided sf object to view alongside map.}
 }
 \value{
 A leaflet map.

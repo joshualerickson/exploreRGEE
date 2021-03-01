@@ -15,7 +15,8 @@ rr(
   leaflet = FALSE,
   palette = "RdBu",
   n_pal = 11,
-  reverse = FALSE
+  reverse = FALSE,
+  user_shape = NULL
 )
 }
 \arguments{
@@ -29,9 +30,9 @@ rr(
 
 \item{band}{A \code{character} indicating what bands/type to use when you have more than one.}
 
-\item{lazy}{\code{logical} whether to run a future or not.}
+\item{lazy}{\code{logical} whether to run a 'sequential' future in the background or not.}
 
-\item{variable}{\code{character} indicating what to label features in leaflet map. Need to know ahead of time.}
+\item{variable}{\code{character} indicating what to label features in leaflet map, optional. NULL (default)}
 
 \item{leaflet}{\code{logical}. TRUE/FALSE whether to view map. FALSE (default).}
 
@@ -40,6 +41,8 @@ rr(
 \item{n_pal}{\code{numeric} indicating levels of colors in palette. 11 is max and (default).}
 
 \item{reverse}{\code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).}
+
+\item{user_shape}{A provided sf object to use as 'region' for an 'ee.image.Image'.}
 }
 \value{
 A leaflet map (leaflet = TRUE) and always a sf object.
@@ -50,7 +53,8 @@ reduceRegions() by using \link[rgee]{ee_as_sf} function.
 }
 \note{
 If lazy is TRUE, the function will be run in the background. If the pixel size is big then please adjust tileScale
-to account for memory. This will not effect zonal stats (pixel size) but will just take longer.
+to account for memory. This will not effect zonal stats (pixel size) but will just take longer. user_shape in this function
+is used when applying a non-get_*() function to rr(); this means you can provide a 'ee.image.Image' and a sf object to run rr().
 }
 \examples{
 \dontrun{

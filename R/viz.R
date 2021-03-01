@@ -10,6 +10,7 @@
 #' @param max \code{numeric} indicating highest value for viewing.
 #' @param gamma \code{numeric} gamma correction factor.
 #' @param opacity \code{numeric} transparent display value.
+#' @param user_shape A provided sf object to view alongside map.
 #' @note This function uses a scale argument which is used to generate a min and max value for viewing. Because this uses getInfo(), it can take a while
 #' depending on the scale. Since this is used for viewing, I would suggest to go bigger on the scale. Also, normalized differences have been hard-coded so that
 #' getInfo() doesn't need to be run, e.g. NDVI (min = 0, max = 1). If a user selects more than one band, the first three bands will be overlayed like earth engine. When visualizing a
@@ -38,34 +39,32 @@
 #' ld8 %>% viz(min = 0, max = 1, band = 'NDVI', palette = 'RdYlGn')
 #'
 #' }
-viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, reverse = FALSE, min = NULL, max = NULL, gamma = NULL, opacity = NULL){
+viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, reverse = FALSE, min = NULL, max = NULL, gamma = NULL, opacity = NULL, user_shape = NULL){
 
 
-  if(missing(data))stop({"Need a previously created get_* object as 'data'."})
+  if(missing(data))stop({"Need a previously created get_* object or 'ee.image.Image' as 'data'."})
+
+  #if(!is.null(user_shape)){stop("Can't have both user_shape and ee.image.Image or get_*() objects. Try to pass it (user_shape) along to viz(), e.g. %>%")}
 
 # dissecting the passed get_*() object, not a huge fan of it but it works for now....
+
   if(class(data)[[1]] == "ee.image.Image"){
     image <- data
-    geom <- ee$Geometry$Rectangle(-180, -90, 180, 90)
-    method <- NULL
+    aoi <- user_shape
+    geom <- setup(aoi)
+    method <- 'user Image'
     param <- NULL
     stat <- NULL
     startDate <- NULL
     endDate <- NULL
-    bbox <- c(-104, 40)
+    bbox <- as.numeric(sf::st_bbox(aoi))
 
-  } else if (class(data)[[1]] == 'sf'){
+  } else if (!is.null(user_shape)){
 
-    image <- data$geometry
-    geom <- setup(data)
-    method <- NULL
-    param <- 'user FeatureCollection'
-    stat <- NULL
-    startDate <- NULL
-    endDate <- NULL
-    bbox <- as.numeric(sf::st_bbox(data))
+   param = 'user_shape'
 
   } else {
+
     image <- data$data
     geom <- data$geom
     method <- data$method
@@ -95,25 +94,24 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
 
     } else {
 
-      if(class(data)[[1]] == 'sf'){
+      if (!is.null(user_shape) & class(data)[[1]] != 'ee.image.Image'){
+        user_shape <- user_shape %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
 
-        id_tag <- paste0(param)
-        m1 <- rgee::Map$addLayer(rgee::sf_as_ee(data),visParams = list(), id_tag)
+        m1 <- clearLeafViz(data, mapview::mapview(user_shape))
 
       } else {
 
+
       reducers <- rgee::ee$Reducer$min()$combine(
-      reducer2 = rgee::ee$Reducer$max(),
-      sharedInputs = TRUE
-    )
+                  reducer2 = rgee::ee$Reducer$max(),
+                  sharedInputs = TRUE)
 
-    stats <- image$reduceRegions(
-      reducer = reducers,
-      collection = geom,
-      scale = scale
-    )
+      stats <- image$reduceRegions(
+               reducer = reducers,
+               collection = geom,
+               scale = scale)
 
-    #make more dynamic in future maybe?
+    #need to make better
 
     if(is.null(min) | is.null(max)){
 
@@ -139,7 +137,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
     m1 <- leaf_call(data = image, min = min, max = max, palette = palette,bands = param, id_tag = id_tag, bbox = bbox, geom = geom, reverse = reverse, n_pal = n_pal, gamma = gamma, opacity = opacity)
 
     }
-      }
+}
 
     }
     print(m1)

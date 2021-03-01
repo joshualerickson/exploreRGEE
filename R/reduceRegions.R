@@ -6,15 +6,16 @@
 #' @param scale A \code{numeric} value indicating scale in meters
 #' @param tileScale \code{numeric} what to reduce regions by, 1 (default). Higher means slower but less memory, e.g. 5.
 #' @param band A \code{character} indicating what bands/type to use when you have more than one.
-#' @param lazy \code{logical} whether to run a future or not.
-#' @param variable \code{character} indicating what to label features in leaflet map. Need to know ahead of time.
+#' @param lazy \code{logical} whether to run a 'sequential' future in the background or not.
+#' @param variable \code{character} indicating what to label features in leaflet map, optional. NULL (default)
 #' @param leaflet \code{logical}. TRUE/FALSE whether to view map. FALSE (default).
 #' @param palette \code{character} color palette using colorBrewer format, e.g. "RdBu" (default), "RdYlGn", etc.
 #' @param n_pal \code{numeric} indicating levels of colors in palette. 11 is max and (default).
 #' @param reverse \code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).
-#'
+#' @param user_shape A provided sf object to use as 'region' for an 'ee.image.Image'.
 #' @note If lazy is TRUE, the function will be run in the background. If the pixel size is big then please adjust tileScale
-#' to account for memory. This will not effect zonal stats (pixel size) but will just take longer.
+#' to account for memory. This will not effect zonal stats (pixel size) but will just take longer. user_shape in this function
+#' is used when applying a non-get_*() function to rr(); this means you can provide a 'ee.image.Image' and a sf object to run rr().
 #' @importFrom rgee ee Map
 #' @return A leaflet map (leaflet = TRUE) and always a sf object.
 #' @export
@@ -42,12 +43,25 @@
 #' ld8_ts <- ld8 %>% band(scale = 500, band = 'NDVI', leaflet = TRUE, variable = 'name')
 #'
 #' }
-rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FALSE, variable = NULL, leaflet = FALSE, palette = "RdBu", n_pal = 11, reverse = FALSE){
+rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FALSE, variable = NULL, leaflet = FALSE, palette = "RdBu", n_pal = 11, reverse = FALSE, user_shape = NULL){
 
   if(missing(scale))stop({"Please provide a scale to reduce region(s)."})
   if(missing(data))stop({"Need a previously created get_* object as 'data'."})
 
   # dissecting the passed get_*() object
+  if(class(data)[[1]] == "ee.image.Image"){
+    aoi <- user_shape %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
+    image <- data
+    geom <- setup(aoi)
+    method <- NULL
+    param <- NULL
+    stat <- NULL
+    startDate <- NULL
+    endDate <- NULL
+    bbox <- as.numeric(sf::st_bbox(aoi))
+
+  } else {
+
   aoi <- data$aoi
   image <- data$data
   geom <- data$geom
@@ -59,6 +73,7 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
   c.low <- data$c.low
   c.high <- data$c.high
   bbox <- data$bbox
+  }
 
   if(is.null(param) & is.null(band))stop({"Need to choose a band name."})
 
@@ -93,13 +108,8 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
 
   # hijacked from rgee
   if(isTRUE(lazy)){
-    prev_plan <- future::plan(future::sequential, .skip = TRUE)
-    on.exit(future::plan(prev_plan, .skip = TRUE), add = TRUE)
-    future::future({
 
-      rgee::ee_as_sf(stats)
-
-    }, lazy = TRUE)
+      rgee::ee_as_sf(stats, lazy = TRUE)
 
   } else {
 
@@ -137,7 +147,7 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
                                                 fillOpacity = .75,
                                                 fillColor = ~ldPal(mean),
                                                 popup = paste0("<b>", "Parameter: ", "</b>",paste0(param, " by ", stat),
-                                                               "<br>", "<b>", "Site ID: ", "</b>", ifelse(is.null(variable), paste("NULL"),region_df[[variable]]) ,
+                                                               "<br>", "<b>", "Site ID: ", "</b>", if(is.null(variable)){paste("NULL")}else{region_df[[variable]]},
                                                                "<br>", "<b>", "Date Range: ", "</b>",paste0("Years: ",stringr::str_remove(startDate,"(-).*"), " - ", stringr::str_remove(endDate,"(-).*"), "; Months: ", c.low, " - ", c.high),
                                                                "<br>", "<b>", "Maximum: ", "</b>",round(region_df$max,3),
                                                                "<br>", "<b>", "Minimum: ", "</b>",round(region_df$min,3),

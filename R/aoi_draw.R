@@ -1,11 +1,30 @@
 #' AOI Draw
 #' @description Draw an Area of Interest (AOI) interactively using a shiny app.
+#' @param user_shape A provided sf object to view alongside map.
+#' @param ... additional arguments for mapview.
 #' @return An sf object.
 #' @export
 #' @importFrom shiny isolate observeEvent
 #'
-#' @examples
-aoi_draw <- function() {
+#' @examples \dontrun{
+#' # Load Libraries
+#'
+#' library(rgee)
+#' rgee::ee_intialize()
+#' library(exploreRGEE)
+#'
+#' huc <- exploreRGEE::huc
+#'
+#' # without providing a sf object
+#'
+#' aoi_draw()
+#'
+#' # with
+#'
+#' aoi_draw(user_shape = huc)
+#' }
+#'
+aoi_draw <- function(user_shape = NULL, ...) {
 
 
   shiny::shinyApp(
@@ -31,22 +50,35 @@ aoi_draw <- function() {
                           shiny::actionButton('finish', "Finish Locations"))
     ),
 
+
+    #server
     server = function(input, output, session) {
 
       output$aoi <- leaflet::renderLeaflet({
+
+        if(is.null(user_shape)){
 
         viz_A() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
           leafem::addMouseCoordinates(epsg = "EPSG:4326", proj4string = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs") %>%
           leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
                                          circleMarkerOptions = F, polygonOptions = T)
+        } else {
 
+            viz_A() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
+            leafem::addMouseCoordinates(epsg = "EPSG:4326", proj4string = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs") %>%
+            leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
+                                           circleMarkerOptions = F, polygonOptions = T) %>% clearLeafAOI(mapview::mapview(user_shape, ...))
+
+          }
 
       })
 
+    #store the sf in a reactiveValues
+    values <- shiny::reactiveValues()
+    values$sf <- sf::st_sf(sf::st_sfc(crs = 4326))
 
-      values <- shiny::reactiveValues()
-      values$sf <- sf::st_sf(sf::st_sfc(crs = 4326))
- observeEvent(input$clear, {
+    #set to null if clear and reset map
+    shiny::observeEvent(input$clear, {
 
             values$sf <- NULL
 
@@ -59,13 +91,25 @@ aoi_draw <- function() {
 
             output$aoi <- leaflet::renderLeaflet({
 
-              map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
-                leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
-                                               circleMarkerOptions = F, polygonOptions = T)
+              if(is.null(user_shape)){
+
+                map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
+                  leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
+                                                 circleMarkerOptions = F, polygonOptions = T)
+              } else {
+
+                map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
+                  leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
+                                                 circleMarkerOptions = F, polygonOptions = T) %>% clearLeafAOI(mapview::mapview(user_shape, ...))
+
+                }
+
             })
 
           })
-      shiny::observeEvent(input$aoi_draw_new_feature, {
+
+     #update map with user input
+     shiny::observeEvent(input$aoi_draw_new_feature, {
 
           feat <- input$aoi_draw_new_feature
           coords <- unlist(feat$geometry$coordinates)
@@ -85,20 +129,17 @@ aoi_draw <- function() {
 
           }
 
-
-
           maps <- shiny::reactive(values$sf)
 
+          #sf to return
+          aoi <<- maps() %>% dplyr::mutate(ID = dplyr::row_number())
 
+          #used to stop the app via button
+          observeEvent(input$finish, {
 
-  aoi <<- maps() %>% dplyr::mutate(ID = dplyr::row_number())
+          shiny::stopApp()
 
-
-observeEvent(input$finish, {
-
-  shiny::stopApp()
-
-})
+          })
 
 
         }
@@ -108,4 +149,42 @@ observeEvent(input$finish, {
 
            ) #end shinyApp
 
-        }
+}
+
+
+
+# function to clear leaflet object and add mapview with aoi_draw()
+
+clearLeafAOI <- function(leaf, data) {
+
+  d_grp <- data@map$x$calls[[11]]$args[[1]]$group
+  grp_names <- append(d_grp, leaf$x$calls[[8]]$args[[2]])
+
+  calls <- data@map$x$calls
+  app <- append(calls, leaf$x$calls)
+
+  leaf$x$calls <- app
+
+  leaf$x$calls[[19]]$args[[2]] <- grp_names
+
+  leaf
+}
+
+# function to clear leaflet object and add mapview with viz()
+
+clearLeafViz <- function(leaf, data) {
+
+  d_grp <- data@map$x$calls[[11]]$args[[1]]$group
+  grp_names <- append(d_grp, leaf$x$calls[[13]]$args[[2]])
+
+  calls <- data@map$x$calls
+  app <- append(calls, leaf$x$calls)
+
+  leaf$x$calls <- app
+
+  leaf$x$calls[[24]]$args[[2]] <- grp_names
+
+  leaf
+}
+
+

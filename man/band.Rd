@@ -9,6 +9,7 @@ band(
   geeFC = NULL,
   scale,
   band = NULL,
+  temporal = "yearly",
   lazy = FALSE,
   fun = ee$Reducer$median(),
   variable = NULL,
@@ -25,7 +26,9 @@ band(
 
 \item{band}{A \code{character} indicating what bands/type to use when you have more than one.}
 
-\item{lazy}{\code{logical} whether to run a future or not.}
+\item{temporal}{A \code{character} indicating what temporal filter to use on the collection, e.g. 'yearly' (default), 'monthly', 'year_month', 'all'.}
+
+\item{lazy}{\code{logical} whether to run a 'sequential' future in the background or not.}
 
 \item{fun}{A earth engine reducer, e.g. ee$Reducer$median() (default).}
 

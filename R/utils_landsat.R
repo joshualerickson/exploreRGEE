@@ -136,16 +136,26 @@ if(isTRUE(cloud_mask)){
 
   if(method == 'harm_ts'){
 # Filter collections and prepare them for merging.
-oliCol = oliCol$filter(colFilter)$map(prepOli)
-etmCol = etmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm))
-tmCol = tmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm))
-collection = ee$ImageCollection(oliCol$merge(etmCol)$merge(tmCol))
+  oliCol = oliCol$filter(colFilter)$map(prepOli)
+  etmCol = etmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm))
+  tmCol = tmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm))
+  collection = ee$ImageCollection(oliCol$merge(etmCol)$merge(tmCol))
+
+} else if (method == 'ts') {
+
+  oliCol = oliCol$filter(colFilter)$map(prepOli)
+  etmCol = etmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
+  tmCol = tmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
+  ld4Col = ld4Col$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
+  collection = ee$ImageCollection(oliCol$merge(etmCol)$merge(tmCol$merge(ld4Col)))
+
 } else {
 
   oliCol = oliCol$filter(colFilter)$map(prepOli)
   etmCol = etmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
   tmCol = tmCol$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
   ld4Col = ld4Col$filter(colFilter)$map(rgee::ee_utils_pyfunc(prepEtm_cloud))
+
 }
 
 } else {
@@ -154,7 +164,6 @@ collection = ee$ImageCollection(oliCol$merge(etmCol)$merge(tmCol))
   tmCol = tmCol$map(rgee::ee_utils_pyfunc(prepEtm_raw))
   ld4Col = ld4Col$map(rgee::ee_utils_pyfunc(prepEtm_raw))
 }
-#Merge the collections.
 
 if(method == 'ld8'){
 

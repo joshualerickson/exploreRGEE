@@ -11,6 +11,7 @@
 #' @param gamma \code{numeric} gamma correction factor.
 #' @param opacity \code{numeric} transparent display value.
 #' @param user_shape A provided sf object to view alongside map.
+#' @param ... additional arguments for mapview.
 #' @note This function uses a scale argument which is used to generate a min and max value for viewing. Because this uses getInfo(), it can take a while
 #' depending on the scale. Since this is used for viewing, I would suggest to go bigger on the scale. Also, normalized differences have been hard-coded so that
 #' getInfo() doesn't need to be run, e.g. NDVI (min = 0, max = 1). If a user selects more than one band, the first three bands will be overlayed like earth engine. When visualizing a
@@ -39,7 +40,7 @@
 #' ld8 %>% viz(min = 0, max = 1, band = 'NDVI', palette = 'RdYlGn')
 #'
 #' }
-viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, reverse = FALSE, min = NULL, max = NULL, gamma = NULL, opacity = NULL, user_shape = NULL){
+viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, reverse = FALSE, min = NULL, max = NULL, gamma = NULL, opacity = NULL, user_shape = NULL, ...){
 
 
   if(missing(data))stop({"Need a previously created get_* object or 'ee.image.Image' as 'data'."})
@@ -97,7 +98,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
       if (!is.null(user_shape) & class(data)[[1]] != 'ee.image.Image'){
         user_shape <- user_shape %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
 
-        m1 <- clearLeafViz(data, mapview::mapview(user_shape))
+        m1 <- clearLeafViz(data, mapview::mapview(user_shape, ...))
 
       } else {
 

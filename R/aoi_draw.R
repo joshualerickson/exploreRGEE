@@ -58,16 +58,33 @@ aoi_draw <- function(user_shape = NULL, ...) {
 
         if(is.null(user_shape)){
 
-        viz_A() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
+        viz_A() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4)%>%
+            leaflet.extras::addMeasurePathToolbar()  %>%
+            leaflet.extras::addStyleEditor(position = "topright",
+                                           openOnLeafletDraw = F)  %>%
+            leaflet.extras::addSearchOSM(options = leaflet.extras::searchOptions(autoCollapse = TRUE, minLength = 2,
+                                                                                 hideMarkerOnCollapse = TRUE, zoom = 14)) %>%
           leafem::addMouseCoordinates(epsg = "EPSG:4326", proj4string = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs") %>%
-          leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
-                                         circleMarkerOptions = F, polygonOptions = T)
+          leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
+                                         rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
+                                         markerOptions = leaflet.extras::drawMarkerOptions(repeatMode = TRUE),
+                                         polygonOptions = leaflet.extras::drawPolygonOptions(repeatMode = TRUE),
+                                         editOptions = leaflet.extras::editToolbarOptions(edit = TRUE, remove = TRUE, selectedPathOptions = TRUE,allowIntersection = TRUE))
         } else {
 
             viz_A() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
+            leaflet.extras::addMeasurePathToolbar()  %>%
+            leaflet.extras::addStyleEditor(position = "topright",
+                                           openOnLeafletDraw = F)  %>%
+            leaflet.extras::addSearchOSM(options = leaflet.extras::searchOptions(autoCollapse = TRUE, minLength = 2,
+                                                                                 hideMarkerOnCollapse = TRUE, zoom = 14)) %>%
             leafem::addMouseCoordinates(epsg = "EPSG:4326", proj4string = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs") %>%
-            leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
-                                           circleMarkerOptions = F, polygonOptions = T) %>% clearLeafAOI(mapview::mapview(user_shape, ...))
+            leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
+                                           rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
+                                           markerOptions = leaflet.extras::drawMarkerOptions(repeatMode = TRUE),
+                                           polygonOptions = leaflet.extras::drawPolygonOptions(repeatMode = TRUE),
+                                           editOptions = leaflet.extras::editToolbarOptions(edit = TRUE, remove = TRUE, selectedPathOptions = TRUE,allowIntersection = TRUE)) %>%
+            clearLeafAOI(mapview::mapview(user_shape, ...))
 
           }
 
@@ -94,13 +111,30 @@ aoi_draw <- function(user_shape = NULL, ...) {
               if(is.null(user_shape)){
 
                 map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
-                  leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
-                                                 circleMarkerOptions = F, polygonOptions = T)
+                  leaflet.extras::addMeasurePathToolbar()  %>%
+                  leaflet.extras::addStyleEditor(position = "topright",
+                                                 openOnLeafletDraw = F)  %>%
+                  leaflet.extras::addSearchOSM(options = leaflet.extras::searchOptions(autoCollapse = TRUE, minLength = 2,
+                                                                                       hideMarkerOnCollapse = TRUE, zoom = 14)) %>%
+                  leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
+                                                 rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
+                                                 markerOptions = leaflet.extras::drawMarkerOptions(repeatMode = TRUE),
+                                                 polygonOptions = leaflet.extras::drawPolygonOptions(repeatMode = TRUE),
+                                                 editOptions = leaflet.extras::editToolbarOptions(edit = TRUE, remove = TRUE, selectedPathOptions = TRUE,allowIntersection = TRUE))
               } else {
 
                 map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
-                  leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F, markerOptions = T,
-                                                 circleMarkerOptions = F, polygonOptions = T) %>% clearLeafAOI(mapview::mapview(user_shape, ...))
+                  leaflet.extras::addMeasurePathToolbar()  %>%
+                  leaflet.extras::addStyleEditor(position = "topright",
+                                 openOnLeafletDraw = F)  %>%
+                  leaflet.extras::addSearchOSM(options = leaflet.extras::searchOptions(autoCollapse = TRUE, minLength = 2,
+                                                                                       hideMarkerOnCollapse = TRUE, zoom = 14)) %>%
+                  leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
+                                                 rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
+                                                 markerOptions = leaflet.extras::drawMarkerOptions(repeatMode = TRUE),
+                                                 polygonOptions = leaflet.extras::drawPolygonOptions(repeatMode = TRUE),
+                                                 editOptions = leaflet.extras::editToolbarOptions(edit = TRUE, remove = TRUE, selectedPathOptions = TRUE,allowIntersection = TRUE)) %>%
+                  clearLeafAOI(mapview::mapview(user_shape, ...))
 
                 }
 

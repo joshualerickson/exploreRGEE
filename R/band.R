@@ -48,7 +48,7 @@
 band <- function(data, geeFC = NULL, scale, band = NULL, temporal = 'yearly', lazy = FALSE,  fun = ee$Reducer$median(), variable = NULL, ggplot = FALSE, save.plot = F) {
 
   if(missing(data)){stop("Need a get_* object to use this function")}
-if(class(data) == 'diff_list' | class(data) == 'terrain_list'){stop("Can't band with this type of list")}
+if(class(data) == 'diff_list' | class(data) == 'terrain_list' | class(data) == 'ee.image.Image'){stop("Can't band with this type of list")}
 if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correct temporal argument")}
 
   # dissecting the passed get_*() object

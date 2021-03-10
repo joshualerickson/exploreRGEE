@@ -2,7 +2,7 @@
 % Please edit documentation in R/reduceRegions.R
 \name{rr}
 \alias{rr}
-\title{Title}
+\title{Reduce Regions}
 \usage{
 rr(
   data,
@@ -38,11 +38,11 @@ rr(
 
 \item{palette}{\code{character} color palette using colorBrewer format, e.g. "RdBu" (default), "RdYlGn", etc.}
 
-\item{n_pal}{\code{numeric} indicating levels of colors in palette. 11 is max and (default).}
+\item{n_pal}{\code{numeric} indicating levels of colors in palette. 6 (default).}
 
 \item{reverse}{\code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).}
 
-\item{user_shape}{A provided sf object to use as 'region' for an 'ee.image.Image'.}
+\item{user_shape}{A sf object to use as 'region' for an 'ee.image.Image'.}
 }
 \value{
 A leaflet map (leaflet = TRUE) and always a sf object.

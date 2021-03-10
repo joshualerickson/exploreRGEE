@@ -2,11 +2,11 @@
 % Please edit documentation in R/get.R
 \name{get_landsat}
 \alias{get_landsat}
-\title{Get Landsat}
+\title{Get Landsat SR Products}
 \usage{
 get_landsat(
   aoi,
-  method = "harm_ts",
+  method = "ld8",
   param = NULL,
   stat = "median",
   cloud_mask = TRUE,
@@ -22,11 +22,11 @@ get_landsat(
 \arguments{
 \item{aoi}{A sf object indicating the extent of the geom.}
 
-\item{method}{A \code{character} indicating what method to use, e.g. 'cloud_mask', 'raw'.}
+\item{method}{A \code{character} indicating what method to use, e.g. 'ld8', 'ld7', 'ld5', 'ld4', 'ts', 'harm_ts'.}
 
 \item{param}{A \code{character} indicating what band to visualize, e.g. 'Blue' or c('Green', 'Red', 'NIR') or nothing returns all bands.}
 
-\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.}
+\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
 \item{cloud_mask}{\code{logical} whether to mask out certain cloud artifacts. TRUE (default).}
 
@@ -49,21 +49,28 @@ A list of Earth Engine Objects and arguments.
 }
 \description{
 This function gets 30-m USGS Landsat 8, 7 , 5 and 4 (Surface Reflectance Tier 1 (SR))
-satellite images from various bands. The image processing uses methods by Roy et al. (2016) and Zhu et al. (2015) (e.g. harmonization and cloud-masking) so that all three Landsat
-missions could be used for time series analysis ('harm_ts') or you can just get individual missions (see details below).
+satellite images from various bands. The image processing for time series can either use methods by Roy et al. (2016) and Zhu et al. (2015) (e.g. harmonization and cloud-masking) so that all three Landsat
+missions could be used for time series analysis ('harm_ts') or you can just get time series without harmonizing ('ts').
 }
 \details{
 The methods currently available (more to come):
 \itemize{
 \item  \strong{harm_ts}: Harmonizing Landsat Missions; 1984-01-01 - 2021-01-22.
+\item  \strong{ts}: Combining Landsat Missions; 1984-01-01 - 2021-01-22.
 \item \strong{ld8}: LANDSAT/LC08/C01/T1_SR; 2013-04-11 - 2021-01-22.
 \item \strong{ld7}: LANDSAT/LC07/C01/T1_SR; 1999-01-01 - 2021-01-21.
 \item \strong{ld5}: LANDSAT/LC05/C01/T1_SR; 1984-01-01 - 2012-05-05.
 \item \strong{ld4}: LANDSAT/LC04/C01/T1_SR; 1982-08-22 - 1993-12-14.
 }
+The param (bands) currently available (more to come):
+\itemize{
+\item  \strong{Blue}, \strong{Green}, \strong{Red}, \strong{NIR},\strong{SWIR1},
+\strong{SWIR2}, \strong{NDVI}, \strong{NDWI}, \strong{NBR}
+}
 }
 \note{
-I'm hoping to make this one more dynamic with importing \href{https://github.com/davemlz/eemont}{#eemont} functions. Also, 'harm_ts' can take a long time to process so be aware!
+If you want to use this with \href{https://github.com/davemlz/eemont}{#eemont} functions then make sure \code{cloud_mask} is set to \code{FALSE}.
+Also, 'harm_ts' and 'ts' can take a long time to process in other function \link[exploreRGEE]{viz}, \link[exploreRGEE]{rr} and \link[exploreRGEE]{band}  so be aware!
 }
 \examples{
 \dontrun{

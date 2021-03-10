@@ -19,8 +19,8 @@ get_diff(data, startDate2 = "2010-01-01", endDate2 = "2018-10-30", band = NULL)
 A list of Earth Engine Objects and arguments.
 }
 \description{
-This function allows the user to get differences by subtracting two images. Only works for one-band selections.
-from different time series, e.g. 2019-2018 images.
+This function allows the user to get differences by subtracting two images. Only works for one-band selections and
+from different time series.
 }
 \examples{
 \dontrun{

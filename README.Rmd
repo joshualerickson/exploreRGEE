@@ -20,8 +20,8 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of exploreRGEE is to explore Google Earth Engine (GEE) in the Rstudio IDE. This package uses bindings and functions from [rgee](https://github.com/r-spatial/rgee) and other spatial packages (sf, leaflet) to explore Google Earth Engine collections in a exploratory data analysis (EDA) manner relatively quickly while using R. This package is meant to be exploratory and experimental but also provides ways to get GEE Image/ImageCollection for different type analysis. The advantage of doing this in 
-R is that some people are not familiar with JavaScript or Python but versed in R and this provides easy access to commonly used or repetitive workflows for analysis  or deliverables. 
+The goal of exploreRGEE is to explore Google Earth Engine (GEE) in the Rstudio IDE. This package uses bindings and functions from [rgee](https://github.com/r-spatial/rgee) and other spatial packages ([sf](https://github.com/r-spatial/sf), [leaflet](https://github.com/rstudio/leaflet)) to explore Google Earth Engine collections relatively quickly while using R. This package is meant to be exploratory and experimental but also provides the user quick functions to reproducible tasks, e.g. repetitive workflows. The reason for doing this in 
+R is that some people are not familiar with JavaScript or Python but versed in R and this provides easy access to use GEE with commonly used methods  for exploratory data analysis ([tidyverse](https://github.com/tidyverse/tidyverse)). 
 
 ## Installation
 
@@ -31,6 +31,9 @@ Development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("joshualerickson/exploreRGEE")
 
+# recommended
+# https://github.com/mikejohnson51/AOI/tree/master/R
+remotes::install_github("mikejohnson51/AOI")
 ```
 
 ## Important Note
@@ -47,6 +50,23 @@ Here is a list of similar packages that I've come across. Please let me know of 
 
 [earthEngineGrabR](https://jesjehle.github.io/earthEngineGrabR/)  
 
+[geemap](https://github.com/giswqs/geemap)
+
+## Flow
+
+The main flow of exploreRGEE is to **get** GEE data and then either vizualize (`viz()`), reduce regions (`rr()`) or look at time series (`band()`). For example,
+
+```{r, eval=F}
+
+get_*() %>% viz()
+get_*() %>% rr()
+get_*() %>% band()
+
+```
+
+## Development
+
+Contributions are welcome!
 
 ## Example
 
@@ -62,7 +82,7 @@ ee_Initialize()
 
 ```
 
-Let's look at Northwestern Montana and the median NPP over a 30 year span (1986 to 2016). To do this, we'll call the `get_npp()`. This `gets` the collection while doing some pre-processing steps, e.g. date range, cloud masking, etc.
+Let's look at Northwestern Montana and the median NPP over a 30 year span (1986 to 2016). To do this, we'll call the `get_npp()`. This `gets` the collection while doing some pre-processing steps, e.g. date range, cloud masking, etc. You could also just use the `get_any()` function and provide the appropriate arguments.
 
 ```{r, eval=T}
 
@@ -72,7 +92,7 @@ npp <- get_npp(lincoln_county, method = 'cloud_mask', param = 'annualNPP', stat 
 ```
 <br>
 
-Now we can visualise this Image with `viz()`. The scale argument in this function is a way to get a *close* guess at a min/max argument. If you already have an idea of a min/max value (e.g. Normalized Difference: 0-1) then just put that into the arguments and `viz()` will not run `getInfo()`. This approach makes visualising much faster.
+Now we can vizualize this Image with `viz()`. The scale argument in this function is a way to get a *close* guess at a min/max argument. If you already have an idea of a min/max value (e.g. Normalized Difference: 0-1) then just put that into the arguments and `viz()` will not run `getInfo()`. This approach makes visualising much faster.
 
 ```{r}
 

@@ -4,7 +4,7 @@
 #' @param ... additional arguments for mapview.
 #' @return An sf object.
 #' @export
-#' @importFrom shiny isolate observeEvent
+#' @importFrom shiny isolate observeEvent reactive reactiveValues
 #'
 #' @examples \dontrun{
 #' # Load Libraries
@@ -47,7 +47,9 @@ aoi_draw <- function(user_shape = NULL, ...) {
                     "))
     ),shiny::tabPanel("Map", style = "height:92vh;",leaflet::leafletOutput('aoi', width = "100%", height = "100%"),
                           shiny::actionButton('clear', "Clear Map"),
-                          shiny::actionButton('finish', "Finish Locations"))
+                          shiny::actionButton('edit', "Edit Table"),
+                          shiny::actionButton('finish', "Finish Locations"), DT::dataTableOutput('data_sf')
+                      )
     ),
 
 
@@ -64,8 +66,8 @@ aoi_draw <- function(user_shape = NULL, ...) {
                                            openOnLeafletDraw = F)  %>%
             leaflet.extras::addSearchOSM(options = leaflet.extras::searchOptions(autoCollapse = TRUE, minLength = 2,
                                                                                  hideMarkerOnCollapse = TRUE, zoom = 14)) %>%
-          leafem::addMouseCoordinates(epsg = "EPSG:4326", proj4string = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs") %>%
-          leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
+            leafem::addMouseCoordinates(epsg = "EPSG:4326", proj4string = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs") %>%
+            leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
                                          rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
                                          markerOptions = leaflet.extras::drawMarkerOptions(repeatMode = TRUE),
                                          polygonOptions = leaflet.extras::drawPolygonOptions(repeatMode = TRUE),
@@ -90,14 +92,12 @@ aoi_draw <- function(user_shape = NULL, ...) {
 
       })
 
-    #store the sf in a reactiveValues
-    values <- shiny::reactiveValues()
-    values$sf <- sf::st_sf(sf::st_sfc(crs = 4326))
 
     #set to null if clear and reset map
     shiny::observeEvent(input$clear, {
 
             values$sf <- NULL
+
 
             leaflet::leafletProxy('aoi') %>% leafem::addMouseCoordinates(epsg = "EPSG:4326", proj4string = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
@@ -106,11 +106,13 @@ aoi_draw <- function(user_shape = NULL, ...) {
             })
 
 
+
+
             output$aoi <- leaflet::renderLeaflet({
 
               if(is.null(user_shape)){
 
-                map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
+                  map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
                   leaflet.extras::addMeasurePathToolbar()  %>%
                   leaflet.extras::addStyleEditor(position = "topright",
                                                  openOnLeafletDraw = F)  %>%
@@ -123,7 +125,7 @@ aoi_draw <- function(user_shape = NULL, ...) {
                                                  editOptions = leaflet.extras::editToolbarOptions(edit = TRUE, remove = TRUE, selectedPathOptions = TRUE,allowIntersection = TRUE))
               } else {
 
-                map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
+                  map_update() %>% leaflet::setView(lat = 48.91167, lng = -114.90246, zoom = 4) %>%
                   leaflet.extras::addMeasurePathToolbar()  %>%
                   leaflet.extras::addStyleEditor(position = "topright",
                                  openOnLeafletDraw = F)  %>%
@@ -141,6 +143,11 @@ aoi_draw <- function(user_shape = NULL, ...) {
             })
 
           })
+
+    #store the sf in a reactiveValues
+    values <- shiny::reactiveValues()
+    values$sf <- sf::st_sf(sf::st_sfc(crs = 4326))
+    values$df <- data.frame(id = rep("ID"))
 
      #update map with user input
      shiny::observeEvent(input$aoi_draw_new_feature, {
@@ -163,10 +170,37 @@ aoi_draw <- function(user_shape = NULL, ...) {
 
           }
 
-          maps <- shiny::reactive(values$sf)
+
+          #let the user add info to table
+          shiny::observeEvent(input$edit, {
+
+            x <- reactiveValues(df = NULL)
+            df <- reactive(data.frame(values$sf, id = rep("ID")))
+            x$df <- df()
+
+            output$data_sf <- DT::renderDT(DT::datatable(x$df, editable = T))
+
+            proxy = DT::dataTableProxy('data_sf')
+
+            observeEvent(input$data_sf_cell_edit, {
+              info = input$data_sf_cell_edit
+              i = info$row
+              j = info$col
+              v = info$value
+              x$df[i, j] <- DT::coerceValue(v, x$df[i, j])
+              DT::replaceData(proxy, x$df, resetPaging = FALSE)  # important
+              maps <- shiny::reactive(x$df)
+              aoi <<- maps() %>% sf::st_as_sf(crs = 4326)
+            })
+
+
+          })
 
           #sf to return
-          aoi <<- maps() %>% dplyr::mutate(ID = dplyr::row_number())
+          maps <- shiny::reactive(values$sf)
+          aoi <<- maps() %>% dplyr::mutate(id = "ID")
+         #
+
 
           #used to stop the app via button
           observeEvent(input$finish, {
@@ -204,21 +238,6 @@ clearLeafAOI <- function(leaf, data) {
   leaf
 }
 
-# function to clear leaflet object and add mapview with viz()
 
-clearLeafViz <- function(leaf, data) {
-
-  d_grp <- data@map$x$calls[[11]]$args[[1]]$group
-  grp_names <- append(d_grp, leaf$x$calls[[13]]$args[[2]])
-
-  calls <- data@map$x$calls
-  app <- append(calls, leaf$x$calls)
-
-  leaf$x$calls <- app
-
-  leaf$x$calls[[24]]$args[[2]] <- grp_names
-
-  leaf
-}
 
 

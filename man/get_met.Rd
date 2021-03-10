@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.R
 \name{get_met}
 \alias{get_met}
-\title{Get Meteorological data from GEE}
+\title{Get Meteorological Products}
 \usage{
 get_met(
   aoi,
@@ -23,9 +23,9 @@ get_met(
 
 \item{method}{\code{character}. 'Norm81m'(default), see details.}
 
-\item{param}{\code{character}. 'ppt' (default). Use the band names for appropriate dataset method, e.g. PRISM = 'ppt', GRIDMET = 'pr', DAYMET = 'prcp', etc.}
+\item{param}{\code{character}. NULL (default). Use the band names for appropriate dataset method, e.g. PRISM = 'ppt', GRIDMET = 'pr', DAYMET = 'prcp', etc.}
 
-\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.}
+\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
 \item{startDate}{\code{character} format date, e.g. "1999-10-23"}
 

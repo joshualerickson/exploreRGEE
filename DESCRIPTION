@@ -6,7 +6,7 @@ Authors@R:
            family = "Erickson",
            role = c("aut", "cre"),
            email = "joshualerickson@gmail.com")
-Description: This package uses rgee and other spatial packages (sf, leaflet) to explore Google Earth Engine collections in a exploratory data analysis manner relatively quickly while using R.
+Description: This package uses rgee and other spatial packages (sf, leaflet) to explore Google Earth Engine collections in a exploratory data analysis manner using R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -26,11 +26,16 @@ Imports:
     utils,
     rlang,
     future,
-    RColorBrewer,
+    grDevices,
     readr,
     plyr,
     shiny,
     leaflet.extras,
-    mapview
+    mapview,
+    DT
 Depends: 
     R (>= 2.10)
+Suggests: knitr, AOI
+URL: https://github.com/joshualerickson/exploreRGEE
+BugReports: https://github.com/joshualerickson/exploreRGEE/issues
+VignetteBuilder: knitr

@@ -1,4 +1,4 @@
-#' Title
+#' Reduce Regions
 #' @description This function allows the user to pass a previously created get_*() object to get
 #' reduceRegions() by using \link[rgee]{ee_as_sf} function.
 #' @param data A previously created get_* object
@@ -10,9 +10,9 @@
 #' @param variable \code{character} indicating what to label features in leaflet map, optional. NULL (default)
 #' @param leaflet \code{logical}. TRUE/FALSE whether to view map. FALSE (default).
 #' @param palette \code{character} color palette using colorBrewer format, e.g. "RdBu" (default), "RdYlGn", etc.
-#' @param n_pal \code{numeric} indicating levels of colors in palette. 11 is max and (default).
+#' @param n_pal \code{numeric} indicating levels of colors in palette. 6 (default).
 #' @param reverse \code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).
-#' @param user_shape A provided sf object to use as 'region' for an 'ee.image.Image'.
+#' @param user_shape A sf object to use as 'region' for an 'ee.image.Image'.
 #' @note If lazy is TRUE, the function will be run in the background. If the pixel size is big then please adjust tileScale
 #' to account for memory. This will not effect zonal stats (pixel size) but will just take longer. user_shape in this function
 #' is used when applying a non-get_*() function to rr(); this means you can provide a 'ee.image.Image' and a sf object to run rr().
@@ -90,11 +90,11 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
 
   if(is.null(geeFC)) {
 
-    reg <- sf_setup(aoi)
+    reg <- sf_setup(aoi = aoi)
 
   } else {
 
-    reg <- geeFC_setup(aoi, geeFC)
+    reg <- geeFC_setup(aoi = aoi, geeFC = geeFC)
 
 
   }

@@ -1,0 +1,20 @@
+template:
+  params:
+    bootswatch: flatly
+navbar:
+  left:
+    - icon: fa-home
+      href: index.html
+  right:
+    - text: "Vignettes"
+      icon: fas fa-book
+      menu:
+      -  text: Get functions
+         href: articles/get_functions.html
+      -  text: Vizualizing
+         href: articles/vizualizing.html
+    - text: "reference"
+      href: reference/index.html
+    - icon: fa fa-github fa-lg
+      text: "github"
+      href: https://github.com/joshualerickson/exploreRGEE/

@@ -21,7 +21,9 @@ col_s2 <- function(c.low, c.high, geom, startDate, endDate, cloud_mask, method){
 
   s2 = s2$filterDate(startDate, endDate)
 
-if(isTRUE(cloud_mask)){ s2 = s2$map(maskcloud1)}
+if(isTRUE(cloud_mask)){
+
+  s2 = s2$map(maskcloud1)
 
   s2 = s2$map(addNDVIsent)
 
@@ -41,6 +43,11 @@ if(isTRUE(cloud_mask)){ s2 = s2$map(maskcloud1)}
                    c("B1","Blue","Green","Red","B5","B6" ,"B7","NIR","B8A","B9","B11","B12","AOT","WVP","SCL","TCI_R","TCI_G", "TCI_B", "MSK_CLDPRB","MSK_SNWPRB",
                      "QA10","QA20","QA60","NDVI", "NDWI", "NBR"))
 
+  }
+
+  } else {
+
+    s2
   }
 }
 

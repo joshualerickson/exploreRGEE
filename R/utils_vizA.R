@@ -1,8 +1,10 @@
 
-#' Leaflet with USGS basemaps
+#' Leaflet basemap
 #'
-#' @return A leaflet map with USGS basemaps
-#' @examples
+#' @return A leaflet map with common basemaps ("Esri.WorldImagery","CartoDB.Positron", "OpenStreetMap",
+#' "CartoDB.DarkMatter",
+#' "OpenTopoMap")
+
 viz_A <- function() {
 
 

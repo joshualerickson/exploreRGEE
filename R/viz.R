@@ -1,20 +1,19 @@
-#' Viz GEE data
+#' Viz-ualize GEE Image/ImageCollections
 #' @description This function allows users to quickly view a previously created get_*() object.
 #' @param data A previously created get_* object
 #' @param scale A \code{numeric} value indicating scale in meters. 250 (default)
 #' @param band A \code{character} indicating what bands/type to use when you have more than one. Can select more than one, e.g. c('Red', 'Green', 'Blue').
 #' @param palette \code{character} color palette using colorBrewer format, e.g. "RdBu" (default), "RdYlGn", etc.
-#' @param n_pal \code{numeric} indicating levels of colors in palette. 11 is max and (default).
+#' @param n_pal \code{numeric} indicating levels of colors in palette. 6 (default).
 #' @param reverse \code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).
 #' @param min \code{numeric} indicating lowest value for viewing.
 #' @param max \code{numeric} indicating highest value for viewing.
 #' @param gamma \code{numeric} gamma correction factor.
 #' @param opacity \code{numeric} transparent display value.
-#' @param user_shape A provided sf object to view alongside map.
+#' @param user_shape A sf object to use as 'aoi/geom' for an 'ee.image.Image'.
 #' @param ... additional arguments for mapview.
 #' @note This function uses a scale argument which is used to generate a min and max value for viewing. Because this uses getInfo(), it can take a while
-#' depending on the scale. Since this is used for viewing, I would suggest to go bigger on the scale. Also, normalized differences have been hard-coded so that
-#' getInfo() doesn't need to be run, e.g. NDVI (min = 0, max = 1). If a user selects more than one band, the first three bands will be overlayed like earth engine. When visualizing a
+#' depending on the scale. Since this is used for viewing, I would suggest to go bigger on the scale. If a user selects more than one band, the 'up-to' three bands will be overlayed like earth engine. When visualizing a
 #' \link[exploreRGEE]{get_diff} object, black is towards 0, red is negative (-) and green/blue is positive (+).
 #' @return A leaflet map.
 #' @export
@@ -40,7 +39,7 @@
 #' ld8 %>% viz(min = 0, max = 1, band = 'NDVI', palette = 'RdYlGn')
 #'
 #' }
-viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, reverse = FALSE, min = NULL, max = NULL, gamma = NULL, opacity = NULL, user_shape = NULL, ...){
+viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 6, reverse = FALSE, min = NULL, max = NULL, gamma = NULL, opacity = NULL, user_shape = NULL, ...){
 
 
   if(missing(data))stop({"Need a previously created get_* object or 'ee.image.Image' as 'data'."})
@@ -60,10 +59,6 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
     endDate <- NULL
     bbox <- as.numeric(sf::st_bbox(aoi))
 
-  } else if (!is.null(user_shape)){
-
-   param = 'user_shape'
-
   } else {
 
     image <- data$data
@@ -77,7 +72,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
   }
 
 
-    if(is.null(param) & is.null(band))stop({"Need to choose a band name."})
+    if(is.null(param) && is.null(band))stop({"Need to choose a band name."})
 
     if(is.null(param)){
 
@@ -86,7 +81,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
 
     }
 
-    if(isTRUE(length(param) > 1) | isTRUE(class(data) == 'diff_list')){
+    if(length(param) > 1 || class(data) == 'diff_list'){
 
       id_tag <- paste0(method, ' - ',stat, "; " ,startDate, " - ", endDate)
 
@@ -94,13 +89,6 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
                       id_tag = id_tag, bbox = bbox, reverse = NULL, n_pal = NULL, bands = param, gamma = gamma, opacity = opacity)
 
     } else {
-
-      if (!is.null(user_shape) & class(data)[[1]] != 'ee.image.Image'){
-        user_shape <- user_shape %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
-
-        m1 <- clearLeafViz(data, mapview::mapview(user_shape, ...))
-
-      } else {
 
 
       reducers <- rgee::ee$Reducer$min()$combine(
@@ -137,10 +125,9 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 11, re
 
     m1 <- leaf_call(data = image, min = min, max = max, palette = palette,bands = param, id_tag = id_tag, bbox = bbox, geom = geom, reverse = reverse, n_pal = n_pal, gamma = gamma, opacity = opacity)
 
-    }
-}
+  }
 
-    }
+}
     print(m1)
 }
 
@@ -152,11 +139,11 @@ Pal <- function(pal, reverse, n_pal) {
 
   if(isTRUE(reverse)){
 
-  rev(RColorBrewer::brewer.pal(n = n_pal ,name = pal))
+  rev(grDevices::hcl.colors(n = n_pal ,palette = pal))
 
   } else {
 
-    RColorBrewer::brewer.pal(n = n_pal ,name = pal)
+    grDevices::hcl.colors(n = n_pal ,palette = pal)
 }
 
 }
@@ -177,14 +164,15 @@ leaf_call <- function(data, geom, min, max, palette, id_tag, bbox, reverse, n_pa
 
     if(is.null(palette)){
 
-if(isTRUE(class(data) == 'diff_list')){
+if(length(bands) > 1){
 
+  mLayer <- rgee::Map$addLayer(data$clip(geom), visParams = list(bands = bands, min = min, max = max, gamma = gamma), id_tag, opacity = opacity)
 
-  mLayer <- rgee::Map$addLayer(data$clip(geom)$sldStyle(sld_intervals(data, bands)), visParams = list(), id_tag, opacity = opacity)
 
 } else {
 
-  mLayer <- rgee::Map$addLayer(data$clip(geom), visParams = list(bands = bands, min = min, max = max, gamma = gamma), id_tag, opacity = opacity)
+
+  mLayer <- rgee::Map$addLayer(data$clip(geom)$sldStyle(sld_intervals(data)), visParams = list(), id_tag, opacity = opacity)
 
 }
 
@@ -208,18 +196,23 @@ mLayer
 # Sld styles for diff_list
 
 
-sld_intervals <- function(data, param){
+sld_intervals <- function(data){
 
 
-    if(isTRUE(class(data) == 'met_list')){
+    if(class(data) == 'met_list' || class(data) == 'npp_list'){
   paste0(
     "<RasterSymbolizer>",
     '<ColorMap  type="ramp" extended="false" >',
-    '<ColorMapEntry color="#B22222" quantity="-100" />',
-    '<ColorMapEntry color="#FF0000" quantity="-25.4" />',
+
+    '<ColorMapEntry color="#B22222" quantity="-400" />',
+    '<ColorMapEntry color="#B22222" quantity="-150" />',
+    '<ColorMapEntry color="#B22222" quantity="-30" />',
+    '<ColorMapEntry color="#FF0000" quantity="-15" />',
     '<ColorMapEntry color="#000000" quantity="0" />',
-    '<ColorMapEntry color="#008000" quantity="25.4" />',
-    '<ColorMapEntry color="#0000CD" quantity="100" />',
+    '<ColorMapEntry color="#008000" quantity="15" />',
+    '<ColorMapEntry color="#0000CD" quantity="30" />',
+    '<ColorMapEntry color="#B22222" quantity="150" />',
+    '<ColorMapEntry color="#B22222" quantity="400" />',
     "</ColorMap>",
     "</RasterSymbolizer>"
   )
@@ -227,11 +220,15 @@ sld_intervals <- function(data, param){
     paste0(
       "<RasterSymbolizer>",
       '<ColorMap  type="ramp" extended="false" >',
+      '<ColorMapEntry color="#B22222" quantity="-5" />',
+      '<ColorMapEntry color="#B22222" quantity="-3" />',
       '<ColorMapEntry color="#B22222" quantity="-0.9" />',
       '<ColorMapEntry color="#FF0000" quantity="-0.2" />',
       '<ColorMapEntry color="#000000" quantity="0" />',
       '<ColorMapEntry color="#008000" quantity="0.2" />',
       '<ColorMapEntry color="#0000CD" quantity="0.9" />',
+      '<ColorMapEntry color="#B22222" quantity="3" />',
+      '<ColorMapEntry color="#B22222" quantity="5" />',
       "</ColorMap>",
       "</RasterSymbolizer>"
     )

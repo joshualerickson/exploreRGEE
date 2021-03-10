@@ -2,13 +2,15 @@
 % Please edit documentation in R/utils_vizA.R
 \name{viz_A}
 \alias{viz_A}
-\title{Leaflet with USGS basemaps}
+\title{Leaflet basemap}
 \usage{
 viz_A()
 }
 \value{
-A leaflet map with USGS basemaps
+A leaflet map with common basemaps ("Esri.WorldImagery","CartoDB.Positron", "OpenStreetMap",
+"CartoDB.DarkMatter",
+"OpenTopoMap")
 }
 \description{
-Leaflet with USGS basemaps
+Leaflet basemap
 }

@@ -1,12 +1,12 @@
 
-#' Get Landsat
+#' Get Landsat SR Products
 #' @description This function gets 30-m USGS Landsat 8, 7 , 5 and 4 (Surface Reflectance Tier 1 (SR))
-#' satellite images from various bands. The image processing uses methods by Roy et al. (2016) and Zhu et al. (2015) (e.g. harmonization and cloud-masking) so that all three Landsat
-#' missions could be used for time series analysis ('harm_ts') or you can just get individual missions (see details below).
+#' satellite images from various bands. The image processing for time series can either use methods by Roy et al. (2016) and Zhu et al. (2015) (e.g. harmonization and cloud-masking) so that all three Landsat
+#' missions could be used for time series analysis ('harm_ts') or you can just get time series without harmonizing ('ts').
 #' @param aoi A sf object indicating the extent of the geom.
-#' @param method A \code{character} indicating what method to use, e.g. 'cloud_mask', 'raw'.
+#' @param method A \code{character} indicating what method to use, e.g. 'ld8', 'ld7', 'ld5', 'ld4', 'ts', 'harm_ts'.
 #' @param param A \code{character} indicating what band to visualize, e.g. 'Blue' or c('Green', 'Red', 'NIR') or nothing returns all bands.
-#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
 #' @param cloud_mask \code{logical} whether to mask out certain cloud artifacts. TRUE (default).
 #' @param startDate \code{character} format date, e.g. "1999-10-23"
 #' @param endDate \code{character} format date, e.g. "1999-10-23"
@@ -15,16 +15,23 @@
 #' @param m.high \code{numeric} high value for mask, e.g. less than 'm.high'
 #' @param c.low \code{numeric} lower month value for calendar range
 #' @param c.high \code{numeric} higher month value for calendar range
-#' @note I'm hoping to make this one more dynamic with importing \href{https://github.com/davemlz/eemont}{#eemont} functions. Also, 'harm_ts' can take a long time to process so be aware!
+#' @note If you want to use this with \href{https://github.com/davemlz/eemont}{#eemont} functions then make sure \code{cloud_mask} is set to \code{FALSE}.
+#' Also, 'harm_ts' and 'ts' can take a long time to process in other function \link[exploreRGEE]{viz}, \link[exploreRGEE]{rr} and \link[exploreRGEE]{band}  so be aware!
 #' @return A list of Earth Engine Objects and arguments.
 #' @details
 #' The methods currently available (more to come):
 #' \itemize{
 #' \item  \strong{harm_ts}: Harmonizing Landsat Missions; 1984-01-01 - 2021-01-22.
+#' \item  \strong{ts}: Combining Landsat Missions; 1984-01-01 - 2021-01-22.
 #' \item \strong{ld8}: LANDSAT/LC08/C01/T1_SR; 2013-04-11 - 2021-01-22.
 #' \item \strong{ld7}: LANDSAT/LC07/C01/T1_SR; 1999-01-01 - 2021-01-21.
 #' \item \strong{ld5}: LANDSAT/LC05/C01/T1_SR; 1984-01-01 - 2012-05-05.
 #' \item \strong{ld4}: LANDSAT/LC04/C01/T1_SR; 1982-08-22 - 1993-12-14.
+#' }
+#' The param (bands) currently available (more to come):
+#' \itemize{
+#' \item  \strong{Blue}, \strong{Green}, \strong{Red}, \strong{NIR},\strong{SWIR1},
+#' \strong{SWIR2}, \strong{NDVI}, \strong{NDWI}, \strong{NBR}
 #' }
 #' @export
 #'
@@ -43,7 +50,7 @@
 #'
 #'
 #' }
-get_landsat <- function(aoi, method = "harm_ts", param = NULL, stat = "median", cloud_mask = TRUE, startDate = '1984-01-01', endDate = '2020-10-30',
+get_landsat <- function(aoi, method = "ld8", param = NULL, stat = "median", cloud_mask = TRUE, startDate = '1984-01-01', endDate = '2020-10-30',
                         mask = FALSE, m.low = NULL, m.high = NULL, c.low = 1, c.high = 12){
 
 
@@ -89,14 +96,14 @@ get_landsat <- function(aoi, method = "harm_ts", param = NULL, stat = "median", 
 }
 
 
-#' Get Meteorological data from GEE
+#' Get Meteorological Products
 #'
 #' @description This function gets you all the Meteorological data you want in a Earth Engine object. See details for available methods.
 #'
 #' @param aoi A sf object indicating the extent of the geom.
 #' @param method \code{character}. 'Norm81m'(default), see details.
-#' @param param \code{character}. 'ppt' (default). Use the band names for appropriate dataset method, e.g. PRISM = 'ppt', GRIDMET = 'pr', DAYMET = 'prcp', etc.
-#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param param \code{character}. NULL (default). Use the band names for appropriate dataset method, e.g. PRISM = 'ppt', GRIDMET = 'pr', DAYMET = 'prcp', etc.
+#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
 #' @param startDate \code{character} format date, e.g. "1999-10-23"
 #' @param endDate \code{character} format date, e.g. "1999-10-23"
 #' @param mask \code{logical} whether to mask out certain ranges
@@ -154,22 +161,25 @@ get_met <- function(aoi, method = "Norm81m", param = NULL, stat = "median", star
     aoi <- data.frame(clat = clat, clng = clng)
     aoi <- sf::st_as_sf(aoi, coords = c("clng", "clat")) %>% sf::st_set_crs(4326) %>% sf::st_transform(crs = 4326)
   }
+
   aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
 
-  colFilter <- rgee::ee$Filter$calendarRange(c.low,c.high, 'month')
+  colFilter <- ee$Filter$calendarRange(c.low,c.high, 'month')
 
   collN <- coll_name(method = method)
 
-  met <- rgee::ee$ImageCollection(collN)$filterBounds(geom)$filterDate(startDate, endDate)
+  met <- ee$ImageCollection(collN)$filterBounds(geom)
 
   if(!is.null(param)){
 
-    met <- rgee::ee$ImageCollection(collN)$select(param)
+    met <- ee$ImageCollection(collN)$select(param)
 
   }
 
   met <- met$filter(colFilter)
+
+  met <- met$filterDate(startDate, endDate)
 
   data <- data_stat(met, stat)
 
@@ -192,13 +202,13 @@ get_met <- function(aoi, method = "Norm81m", param = NULL, stat = "median", star
 }
 
 
-#' Get Sentinel-2 MSI: MultiSpectral Instrument, Level-1C
+#' Get Sentinel-2 Products
 #'
-#' @description This function uses the Sentinel-2 MSI: MultiSpectral Instrument, Level-1C satellite.
+#' @description This function uses the Sentinel-2 missions.
 #' @param aoi A sf object indicating the extent of the geom.
 #' @param method A \code{character} indicating what method to use, e.g. 'S2_1C' (default) or 'S2_2A'.
 #' @param param A \code{character} indicating what band to visualize, e.g. 'Blue', 'Green', 'Red', 'NIR', 'NDVI', 'NDWI', 'NBR', etc.
-#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
 #' @param cloud_mask \code{logical} whether to mask out certain cloud artifacts. TRUE (default).
 #' @param startDate \code{character} format date, e.g. "2018-10-23"
 #' @param endDate \code{character} format date, e.g. "2018-10-23"
@@ -264,7 +274,7 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
   return(sent_list)
 }
 
-#' Get Net Annual NPP
+#' Get Net Annual NPP (CONUS)
 #'
 #' @description This function uses the 30-m resolution image collection of Landsat Net Primary Productivity
 #' to get selected time frames. There's really only one product here so 'cloud_mask' is a method instead of a logical.
@@ -272,7 +282,7 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
 #' @param aoi A sf object indicating the extent of the geom.
 #' @param method A \code{character} indicating what method to use, e.g. 'cloud_mask', 'raw'.
 #' @param param A \code{character} indicating what band to visualize, e.g. 'annualNPP'.
-#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
 #' @param startDate \code{character} format date, e.g. "2018-10-23"
 #' @param endDate \code{character} format date, e.g. "2018-10-23"
 #' @param mask \code{logical} whether to mask out certain ranges
@@ -343,8 +353,8 @@ get_npp <- function(aoi, method = "cloud_mask", param = 'annualNPP', stat = "med
 
 
 #' Get Image Difference
-#' @description This function allows the user to get differences by subtracting two images. Only works for one-band selections.
-#' from different time series, e.g. 2019-2018 images.
+#' @description This function allows the user to get differences by subtracting two images. Only works for one-band selections and
+#' from different time series.
 #' @param data A previously create get_* object
 #' @param startDate2 \code{character} format date, e.g. "1999-10-23". A second start date to use as the subtraction window.
 #' @param endDate2 \code{character} format date, e.g. "1999-10-23". A second end date to use as the subtraction window.
@@ -406,7 +416,7 @@ image_col2 <- class_type(data,aoi = aoi,method = method, param = param, stat = s
 
   image2 <- image_col2$data
 
-if(is.null(param) | length(param) > 1){
+if(!is.null(band)){
 
     image = image$select(band)
 
@@ -424,7 +434,7 @@ if(is.null(param) | length(param) > 1){
   return(diff_list)
 
 }
-#' Get DEMs
+#' Get Terrain Products
 #' @description This function takes the USGS NED (National Elevation Dataset)
 #' or SRTM (Shuttle Radar Topography Mission) and gets a handful of terrain indices. This is good for
 #' downloaded areas for further analysis or passing on for some quick stats.
@@ -604,13 +614,13 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 }
 
 
-#' Get Any
+#' Get Earth Engine Products
 #' @description This function allows the user to provide a earth engine image/imageCollection \code{character} string which will help with simple processing.
 #' @param aoi A sf object indicating the extent of the geom.
 #' @param i_type A \code{character} indicating what type of image, e.g. 'ImageCollection' or 'Image'.
 #' @param method A \code{character} indicating what imageCollection to use, e.g. "UMD/hansen/global_forest_change_2019_v1_7".
 #' @param param A \code{character} indicating what band to select.
-#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
 #' @param startDate \code{character} format date, e.g. "1999-10-23"
 #' @param endDate \code{character} format date, e.g. "1999-10-23"
 #' @param mask \code{logical} whether to mask out certain ranges
@@ -618,7 +628,7 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 #' @param m.high \code{numeric} high value for mask, e.g. less than 'm.high'
 #' @param c.low \code{numeric} lower month value for calendar range
 #' @param c.high \code{numeric} higher month value for calendar range
-#' @note I'm hoping to make this one more dynamic with importing \href{https://github.com/davemlz/eemont}{#eemont} functions.
+#' @note Use how you would normally call a GEE session online but with method as your collection snippet.
 #' @return A list of Earth Engine Objects and arguments.
 
 #' @export

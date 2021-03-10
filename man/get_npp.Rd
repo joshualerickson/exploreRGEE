@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.R
 \name{get_npp}
 \alias{get_npp}
-\title{Get Net Annual NPP}
+\title{Get Net Annual NPP (CONUS)}
 \usage{
 get_npp(
   aoi,
@@ -25,7 +25,7 @@ get_npp(
 
 \item{param}{A \code{character} indicating what band to visualize, e.g. 'annualNPP'.}
 
-\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.}
+\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
 \item{startDate}{\code{character} format date, e.g. "2018-10-23"}
 

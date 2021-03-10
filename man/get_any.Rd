@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.R
 \name{get_any}
 \alias{get_any}
-\title{Get Any}
+\title{Get Earth Engine Products}
 \usage{
 get_any(
   aoi,
@@ -28,7 +28,7 @@ get_any(
 
 \item{param}{A \code{character} indicating what band to select.}
 
-\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.}
+\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
 \item{startDate}{\code{character} format date, e.g. "1999-10-23"}
 
@@ -51,7 +51,7 @@ A list of Earth Engine Objects and arguments.
 This function allows the user to provide a earth engine image/imageCollection \code{character} string which will help with simple processing.
 }
 \note{
-I'm hoping to make this one more dynamic with importing \href{https://github.com/davemlz/eemont}{#eemont} functions.
+Use how you would normally call a GEE session online but with method as your collection snippet.
 }
 \examples{
 \dontrun{

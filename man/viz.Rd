@@ -2,20 +2,21 @@
 % Please edit documentation in R/viz.R
 \name{viz}
 \alias{viz}
-\title{Viz GEE data}
+\title{Viz-ualize GEE Image/ImageCollections}
 \usage{
 viz(
   data,
   scale = 250,
   band = NULL,
   palette = "RdBu",
-  n_pal = 11,
+  n_pal = 6,
   reverse = FALSE,
   min = NULL,
   max = NULL,
   gamma = NULL,
   opacity = NULL,
-  user_shape = NULL
+  user_shape = NULL,
+  ...
 )
 }
 \arguments{
@@ -27,7 +28,7 @@ viz(
 
 \item{palette}{\code{character} color palette using colorBrewer format, e.g. "RdBu" (default), "RdYlGn", etc.}
 
-\item{n_pal}{\code{numeric} indicating levels of colors in palette. 11 is max and (default).}
+\item{n_pal}{\code{numeric} indicating levels of colors in palette. 6 (default).}
 
 \item{reverse}{\code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).}
 
@@ -39,7 +40,9 @@ viz(
 
 \item{opacity}{\code{numeric} transparent display value.}
 
-\item{user_shape}{A provided sf object to view alongside map.}
+\item{user_shape}{A sf object to use as 'aoi/geom' for an 'ee.image.Image'.}
+
+\item{...}{additional arguments for mapview.}
 }
 \value{
 A leaflet map.
@@ -49,8 +52,7 @@ This function allows users to quickly view a previously created get_*() object.
 }
 \note{
 This function uses a scale argument which is used to generate a min and max value for viewing. Because this uses getInfo(), it can take a while
-depending on the scale. Since this is used for viewing, I would suggest to go bigger on the scale. Also, normalized differences have been hard-coded so that
-getInfo() doesn't need to be run, e.g. NDVI (min = 0, max = 1). If a user selects more than one band, the first three bands will be overlayed like earth engine. When visualizing a
+depending on the scale. Since this is used for viewing, I would suggest to go bigger on the scale. If a user selects more than one band, the 'up-to' three bands will be overlayed like earth engine. When visualizing a
 \link[exploreRGEE]{get_diff} object, black is towards 0, red is negative (-) and green/blue is positive (+).
 }
 \examples{

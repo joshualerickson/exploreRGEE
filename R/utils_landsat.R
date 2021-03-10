@@ -3,12 +3,14 @@
 # Function to get and rename bands of interest from OLI.
 
 renameOli = function(img) {
-  img$select(c('B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'pixel_qa'),c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa'))
+  img$select(c('B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'pixel_qa'),
+             c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa'))
 }
 
 # Function to get and rename bands of interest from ETM+.
 renameEtm = function(img) {
-  img$select(c('B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'pixel_qa'),c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa'))
+  img$select(c('B1', 'B2', 'B3', 'B4', 'B5', 'B7', 'pixel_qa'),
+             c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2', 'pixel_qa'))
 }
 
 # Function to convert etm to oli using coefficients
@@ -95,31 +97,6 @@ prepEtm_cloud = function(img) {
   return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
 }
 
-# Define function to prepare OLI images.
-
-
-prepOli_raw = function(img) {
-  orig = img
-  img = renameOli(img)
-  img = addNDVI(img)
-  img = addNDWI(img)
-  img = calcNbr(img)
-  return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
-}
-
-# Define function to prepare ETM+ images.
-
-
-prepEtm_raw = function(img) {
-  orig = img
-  img = renameEtm(img)
-  img = addNDVI(img)
-  img = addNDWI(img)
-  img = calcNbr(img)
-  return(ee$Image(img$copyProperties(orig, orig$propertyNames())))
-}
-
-
 # function for pre-processing landsat data
 
 col_ld <- function(c.low, c.high, geom, startDate, endDate, method, cloud_mask){
@@ -158,11 +135,6 @@ if(isTRUE(cloud_mask)){
 
 }
 
-} else {
-  oliCol = oliCol$map(prepOli_raw)
-  etmCol = etmCol$map(rgee::ee_utils_pyfunc(prepEtm_raw))
-  tmCol = tmCol$map(rgee::ee_utils_pyfunc(prepEtm_raw))
-  ld4Col = ld4Col$map(rgee::ee_utils_pyfunc(prepEtm_raw))
 }
 
 if(method == 'ld8'){

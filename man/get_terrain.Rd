@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.R
 \name{get_terrain}
 \alias{get_terrain}
-\title{Get DEMs}
+\title{Get Terrain Products}
 \usage{
 get_terrain(
   aoi,

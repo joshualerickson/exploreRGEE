@@ -57,15 +57,14 @@ return(list(reg = reg, geom = geom, aoi = aoi))
 
 # function for setting up function and geom with a GEE FeatureCollection
 
-geeFC_setup <- function(aoi = aoi, geeFC = geeFC){
+geeFC_setup <- function(aoi, geeFC){
 
   geom <- setup(aoi)
 
-  geeFC_id <- paste0(geeFC)
+  reg <- ee$FeatureCollection(geeFC)
+  reg <- reg$filterBounds(geom)
 
-  reg <- ee$FeatureCollection(geeFC_id)$filterBounds(geom)
-
-  aoi <- rgee::ee_as_sf(reg)
+  #aoi <- rgee::ee_as_sf(reg)
 
   return(list(reg = reg, geom = geom, aoi = aoi))
 }
@@ -113,7 +112,7 @@ data_stat <- function(data,stat){
 
 class_type <- function(data, aoi, method, param, stat,
                        startDate, endDate, c.low, c.high, mask,
-                       m.low, m.high,...){
+                       m.low, m.high){
 
   if (class(data) == "landsat_list"){
 

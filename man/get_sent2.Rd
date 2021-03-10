@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.R
 \name{get_sent2}
 \alias{get_sent2}
-\title{Get Sentinel-2 MSI: MultiSpectral Instrument, Level-1C}
+\title{Get Sentinel-2 Products}
 \usage{
 get_sent2(
   aoi,
@@ -26,7 +26,7 @@ get_sent2(
 
 \item{param}{A \code{character} indicating what band to visualize, e.g. 'Blue', 'Green', 'Red', 'NIR', 'NDVI', 'NDWI', 'NBR', etc.}
 
-\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'mean', 'median', 'max', 'min', 'sum', 'stdDev', 'first'.}
+\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
 \item{cloud_mask}{\code{logical} whether to mask out certain cloud artifacts. TRUE (default).}
 
@@ -48,7 +48,7 @@ get_sent2(
 A list of Earth Engine Objects and arguments.
 }
 \description{
-This function uses the Sentinel-2 MSI: MultiSpectral Instrument, Level-1C satellite.
+This function uses the Sentinel-2 missions.
 }
 \examples{
 \dontrun{

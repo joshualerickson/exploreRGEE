@@ -14,6 +14,8 @@ navbar:
          href: articles/get_functions.html
       -  text: Vizualizing
          href: articles/vizualizing.html
+      -  text: Reducing Regions
+      -  text: Time Series (band)
     - text: "reference"
       href: reference/index.html
     - icon: fa fa-github fa-lg

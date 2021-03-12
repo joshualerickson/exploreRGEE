@@ -408,6 +408,7 @@ get_diff <- function(data, startDate2 = '2010-01-01', endDate2 = '2018-10-30', b
 
   if(is.null(param) & is.null(band)){stop("need to select only one band!")}
 
+  if(!is.null(band)){param <- band}
 
 
 image_col2 <- class_type(data,aoi = aoi,method = method, param = param, stat = stat,
@@ -416,14 +417,10 @@ image_col2 <- class_type(data,aoi = aoi,method = method, param = param, stat = s
 
   image2 <- image_col2$data
 
-if(!is.null(band)){
+    image = image$select(param)
 
-    image = image$select(band)
+    image2 = image2$select(param)
 
-    image2 = image2$select(band)
-
-    param = band
-  }
   final_image <- image2$subtract(image)
 
   diff_list <- list(imageCol = list(imageCol, image_col2$imageCol), data = final_image, geom = geom, method = method, param = param, stat = stat,

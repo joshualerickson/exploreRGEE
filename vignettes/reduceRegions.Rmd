@@ -1,0 +1,13 @@
+---
+title: "Using rr"
+author: "Josh Erickson"
+date: "3/6/2021"
+vignette: >
+  %\VignetteIndexEntry{2. Using viz}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+## Intro
+
+Sometimes a user may want to reduce a image to a region (e.g. zonal statistics) to gather some aggregated information. Earth Engine and rgee provide means to do this through the `reduceRegions()` function. In addition, rgee provides a function `ee_as_sf()` which let's us easily get that information in the R session! However, there are a few steps that are needed before you get to this point; 1.) a reduced image, 2.) a reducer stat, 3). a feature to reduce on (geometry). Th

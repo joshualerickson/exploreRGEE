@@ -140,7 +140,7 @@ class_type <- function(data, aoi, method, param, stat,
 
   } else if (class(data) == "any_list"){
 
-    get_npp(aoi = aoi,method = method, param = param, stat = stat,
+    get_any(aoi = aoi,method = method, param = param, stat = stat,
             startDate = startDate, endDate = endDate, c.low = c.low, c.high = c.high, mask = mask,
             m.low = m.low, m.high = m.high)
 

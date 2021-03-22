@@ -1,11 +1,12 @@
 
 #' Get Landsat SR Products
 #' @description This function gets 30-m USGS Landsat 8, 7 , 5 and 4 (Surface Reflectance Tier 1 (SR))
-#' satellite images from various bands. The image processing for time series can either use methods by Roy et al. (2016) and Zhu et al. (2015) (e.g. harmonization and cloud-masking) so that all three Landsat
-#' missions could be used for time series analysis ('harm_ts') or you can just get time series without harmonizing ('ts').
+#' satellite images from various bands. The image processing for time series can either use methods by Roy et al. (2016) (e.g. harmonization) so that all three Landsat
+#' missions will be scaled for a harmonized time series analysis ('harm_ts') or you can just get time series without harmonizing ('ts'). All the methods will use
+#' Zhu et al. (2015) masking function and filter image properties by cloud cover less than 50% and Geometric RMSE Model less than 10.
 #' @param aoi A sf object indicating the extent of the geom.
 #' @param method A \code{character} indicating what method to use, e.g. 'ld8', 'ld7', 'ld5', 'ld4', 'ts', 'harm_ts'.
-#' @param param A \code{character} indicating what band to visualize, e.g. 'Blue' or c('Green', 'Red', 'NIR') or nothing returns all bands.
+#' @param param A \code{character} indicating what band to visualize, e.g. 'Blue' or c('Green', 'Red', 'NIR') or NULL returns all bands.
 #' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
 #' @param cloud_mask \code{logical} whether to mask out certain cloud artifacts. TRUE (default).
 #' @param startDate \code{character} format date, e.g. "1999-10-23"
@@ -276,13 +277,13 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
 
 #' Get Net Annual NPP (CONUS)
 #'
-#' @description This function uses the 30-m resolution image collection of Landsat Net Primary Productivity
-#' to get selected time frames. There's really only one product here so 'cloud_mask' is a method instead of a logical.
+#' @description This function gets Net Primary Productivity products for selected time frames. Cloud masking will be at 50% if TRUE; however, for 'ld_NPP' 255 will be masked out.
 #'
 #' @param aoi A sf object indicating the extent of the geom.
-#' @param method A \code{character} indicating what method to use, e.g. 'cloud_mask', 'raw'.
-#' @param param A \code{character} indicating what band to visualize, e.g. 'annualNPP'.
+#' @param method A \code{character} indicating what method to use, e.g. 'ld_NPP', 'modis_NPP', 'terra', 'aqua'.
+#' @param param A \code{character} indicating what band to visualize, e.g. 'annualNPP', 'Npp', etc.
 #' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param cloud_mask \code{logical} whether to mask out certain cloud artifacts. TRUE (default).
 #' @param startDate \code{character} format date, e.g. "2018-10-23"
 #' @param endDate \code{character} format date, e.g. "2018-10-23"
 #' @param mask \code{logical} whether to mask out certain ranges
@@ -290,13 +291,14 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
 #' @param m.high \code{numeric} high value for mask, e.g. less than 'm.high'
 #' @param c.low \code{numeric} lower month value for calendar range
 #' @param c.high \code{numeric} higher month value for calendar range
-#' @note The Landsat Net Primary Production (NPP) CONUS dataset
-#' estimates NPP using Landsat Surface Reflectance for CONUS.
-#' NPP is the amount of carbon captured by plants in an ecosystem,
-#' after accounting for losses due to respiration.
-#'  NPP is calculated using the MOD17 algorithm (see MOD17 User Guide)
-#'  with Landsat Surface Reflectance, gridMET, and the National Land Cover Database. Some composites were masked out because
-#'  of missing data, high cloud contamination, and/or erroneous pixels which didn't meet the gap-filling method.
+#' @details
+#' The methods currently available:
+#' \itemize{
+#' \item  \strong{ld_NPP}: UMT/NTSG/v2/LANDSAT/NPP; 1986-01-01 - 2019-01-01.
+#' \item  \strong{modis_NPP}: UMT/NTSG/v2/MODIS/NPP; 2001-01-01 - 2019-01-01.
+#' \item \strong{terra}: MODIS/006/MOD17A3HGF; 2001-01-01 - 2019-01-01.
+#' \item \strong{aqua}: MODIS/006/MYD17A3HGF; 2002-01-01 - 2019-01-01.
+#' }
 #' @return A list of Earth Engine Objects and arguments.
 #' @export
 #' @examples \dontrun{
@@ -309,13 +311,13 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
 #' # Bring in data
 #' huc <- exploreRGEE::huc
 #'
-#' npp <- get_npp(huc, method = 'cloud_mask', param = 'annualNPP', startDate = '2014-01-01',
+#' npp <- get_npp(huc, method = 'ld_NPP', param = 'annualNPP', startDate = '2014-01-01',
 #'                   endDate = '2018-12-31')
 #'
 #'
 #' }
 
-get_npp <- function(aoi, method = "cloud_mask", param = 'annualNPP', stat = "median", startDate = "1986-01-01", endDate = "2019-01-01",
+get_npp <- function(aoi, method = "ld_NPP", param = NULL, stat = "median", cloud_mask = TRUE, startDate = "1986-01-01", endDate = "2019-01-01",
                     mask = FALSE, m.low = NULL, m.high = NULL, c.low = 1, c.high = 12){
 
   if(is.atomic(aoi)) {
@@ -328,7 +330,15 @@ get_npp <- function(aoi, method = "cloud_mask", param = 'annualNPP', stat = "med
   aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
 
-  col_med <- npp_med(geom, startDate, endDate, method)$select(param)
+  if(is.null(param)){
+
+    col_med <- npp_med(geom, startDate, endDate, method, cloud_mask)
+
+  } else {
+
+  col_med <- npp_med(geom, startDate, endDate, method, cloud_mask)$select(param)
+
+  }
   data <- data_stat(col_med, stat)
 
   if(mask == TRUE) {
@@ -720,5 +730,214 @@ get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat 
 
   class(any_list) = "any_list"
   return(any_list)
+
+}
+
+#' NASA Earth Exchange Products
+#' @description This function allows the user to get NASA Earth Exchange products.
+#' @param aoi A sf object indicating the extent of the geom.
+#' @param method A \code{character} indicating what imageCollection to use, e.g. "ensemble" is equal to = "NASA/NEX-DCP30_ENSEMBLE_STATS".
+#' @param scenario A \code{character} indicating what Representative Concentration Pathways (RCPs) to use, e.g. 'rcp85' (default).
+#' @param model A \code{character} indicating what model to use (only for 'dcp' and 'gddp'). 'ACCESS1-0' (default).
+#' @param param A \code{character} indicating what band to select.
+#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param startDate \code{character} format date, e.g. "1999-10-23"
+#' @param endDate \code{character} format date, e.g. "1999-10-23"
+#' @param mask \code{logical} whether to mask out certain ranges
+#' @param m.low \code{numeric} low value for mask, e.g. greater than 'm.low'
+#' @param m.high \code{numeric} high value for mask, e.g. less than 'm.high'
+#' @param c.low \code{numeric} lower month value for calendar range
+#' @param c.high \code{numeric} higher month value for calendar range
+#' @note \code{scenario} only uses \code{dcp} and \code{gddp} so disregard when using \code{ensemble} and be aware when using the others. In addition, it is up to the users to understand what model to use with
+#' what scenario! Some scenarios and models don't jive so do your research.
+#' @return A list of Earth Engine Objects and arguments.
+#' @details
+#' The \code{method}, \code{scenario} and \code{model} currently available:
+#' \itemize{
+#' \item  \strong{method}: ensemble, dcp, gddp.
+#' \item  \strong{scenario}: 'historical', 'rcp26', 'rcp45', 'rcp60', 'rcp85'
+#' \item \strong{model}: ACCESS1-0', 'bcc-csm1-1', 'bcc-csm1-1-m', 'BNU-ESM', 'CanESM2', 'CCSM4', 'CESM1-BGC', 'CESM1-CAM5', 'CMCC-CM', 'CNRM-CM5', 'CSIRO-Mk3-6-0', 'FGOALS-g2', 'FIO-ESM', 'GFDL-CM3', 'GFDL-ESM2G', 'GFDL-ESM2M', 'GISS-E2-H-CC', 'GISS-E2-R', 'GISS-E2-R-CC', 'HadGEM2-AO', 'HadGEM2-CC', 'HadGEM2-ES', 'inmcm4', 'IPSL-CM5A-LR', 'IPSL-CM5A-MR', 'IPSL-CM5B-LR', 'MIROC5', 'MIROC-ESM', 'MIROC-ESM-CHEM', 'MPI-ESM-LR', 'MPI-ESM-MR', 'MRI-CGCM3', 'NorESM1-M'
+#' }
+#' @export
+#'
+#' @examples \dontrun{
+#' # Load Libraries
+#'
+#' library(rgee)
+#' rgee::ee_intialize()
+#' library(exploreRGEE)
+#'
+#' # Bring in data
+#' huc <- exploreRGEE::huc
+#'
+#' # get any Image or ImageCollection
+#'
+#' forest_cover_loss <- get_any(huc, method = 'ensemble',
+#'                              scenario = 'rcp85',
+#'                              model = 'ACCESS1-0',
+#'                              method = 'NASA/NEX-DCP30_ENSEMBLE_STATS',
+#'                              param = 'lossyear')
+#' }
+#'
+get_nex <- function(aoi, method = 'ensemble', scenario = 'rcp85', model = 'ACCESS1-0', param = NULL, stat = "median", startDate = NULL, endDate = NULL,
+                    mask = FALSE, m.low = NULL, m.high = NULL, c.low = NULL, c.high = NULL){
+
+
+  if(is.atomic(aoi)) {
+
+    clng <- aoi[[1]]
+    clat <- aoi[[2]]
+    aoi <- data.frame(clat = clat, clng = clng)
+    aoi <- sf::st_as_sf(aoi, coords = c("clng", "clat")) %>% sf::st_set_crs(4326) %>% sf::st_transform(crs = 4326)
+
+  }
+  aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
+  geom <- setup(aoi)
+
+  if(method == 'ensemble') {
+
+    col = ee$ImageCollection('NASA/NEX-DCP30_ENSEMBLE_STATS')$
+      filter(ee$Filter$eq('scenario', scenario))
+
+  } else if (method == 'dcp'){
+
+    col = ee$ImageCollection("NASA/NEX-DCP30")$
+      filter(ee$Filter$eq('scenario', scenario))$
+      filter(ee$Filter$eq('model', model))
+
+  } else if (method == 'gddp'){
+
+    col = ee$ImageCollection('NASA/NEX-GDDP')$
+      filter(ee$Filter$eq('scenario', scenario))$
+      filter(ee$Filter$eq('model', model))
+  }
+
+    col = col$filterBounds(geom)
+
+    calRange = rgee::ee$Filter$calendarRange(c.low,c.high, 'month')
+
+    if(!is.null(c.low) & !is.null(c.high)){
+      col <- col$filter(calRange)
+    }
+
+    if(!is.null(startDate) & !is.null(endDate)){
+      col <- col$filterDate(startDate, endDate)
+    }
+
+    if(!is.null(param)){
+
+      col = col$select(param)
+
+    }
+
+    data <- data_stat(col, stat)
+
+
+  if(mask == TRUE) {
+
+    data_m <- data$gt(m.low)$And(data$lt(m.high))
+
+    data <- data$updateMask(data_m)
+
+  }
+
+  any_list <- list(imageCol = col, data = data, geom = geom, method = method, param = param, stat = stat,
+                   startDate = startDate, endDate = endDate, c.low = c.low, c.high = c.high, mask = mask,
+                   m.low = m.low, m.high = m.high,
+                   aoi = aoi,
+                   bbox = as.numeric(sf::st_bbox(aoi)))
+
+  class(any_list) = "nex_list"
+  return(any_list)
+
+}
+
+#' Get Image Difference
+#' @description This function allows the user to get a linearFit() from an ImageCollection.
+#' @param data A previously create get_* object.
+#' @param band A \code{character} indicating what bands/type to use when you have more than one. Can \strong{only} select one, e.g. 'NDVI'.
+#' @param stat A \code{character} indicating what to reduce the imageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param temporal A \code{character} indicating what temporal filter to use on the collection, e.g. 'yearly' (default), 'year_month', 'all'.
+#' @return A list of Earth Engine Objects and arguments. Specifically an ImageCollection with
+#' bands c('scale', 'offset').
+#' @export
+#' @examples \dontrun{
+#' # Load Libraries
+#'
+#' library(rgee)
+#' rgee::ee_intialize()
+#' library(exploreRGEE)
+#'
+#' # Bring in data
+#' huc <- exploreRGEE::huc
+#'
+#' # get intitial image. Can by any get_*().
+#'
+#' ld8 <- get_landsat(huc, method = 'ld8', startDate = '2014-01-01',
+#'                   endDate = '2018-12-31', c.low = 6, c.high = 11)
+#'
+#' # now subtract from new one
+#'
+#' lr <- ld8 %>% get_linear(band = 'NDVI', temporal = 'yearly')
+#'
+#' lr %>% viz(band = 'scale')
+#' }
+
+get_linear <- function(data, method = 'lfit', band = NULL, stat = 'median', temporal = 'yearly'){
+
+  if(missing(data))stop({"Need a previously created get_* object as 'data'."})
+
+    aoi <- data$aoi
+    imageCol <- data$imageCol
+    geom <- data$geom
+    param <- data$param
+    startDate <- data$startDate
+    endDate <- data$endDate
+    c.low <- data$c.low
+    c.high <- data$c.high
+    bbox <- data$bbox
+
+
+  if(is.null(param) & is.null(band)){stop("need to select only one band!")}
+
+  if(!is.null(band)){param <- band}
+
+  collection = imageCol$select(param)
+
+  time_band = function(image){
+
+    return(image$addBands(image$metadata('system:time_start')$divide(3.1536e10)))
+
+  }
+  collection = collection$map(time_band)
+
+  if (temporal == 'yearly'){
+
+      collection <- year_filter(startDate = startDate, endDate = endDate,
+                            imageCol = collection, stat = stat)
+      ind_dep <- c('system:time_start', param)
+
+  } else if (temporal == 'year_month'){
+
+    collection <- year_month_filter(startDate = startDate, endDate = endDate,
+                                    imageCol = collection, stat = stat, c.low = c.low,
+                                    c.high = c.high)
+    ind_dep <- c(paste0('system:time_start_',stat), paste0(param, '_',stat))
+
+  } else {
+
+    ind_dep <- c('system:time_start', param)
+
+  }
+
+
+  trend <- collection$select(ind_dep)$reduce(ee$Reducer$linearFit())
+
+  linear_list <- list(imageCol = collection, data = trend, geom = geom, method = method, param = NULL, stat = stat,
+                    startDate = startDate, endDate = endDate,c.low = c.low, c.high = c.high,
+                    bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
+
+  class(linear_list) = "linear_list"
+  return(linear_list)
 
 }

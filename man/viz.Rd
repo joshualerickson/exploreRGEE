@@ -20,7 +20,7 @@ viz(
 )
 }
 \arguments{
-\item{data}{A previously created get_* object}
+\item{data}{A previously created get_* object or ee.image.Image}
 
 \item{scale}{A \code{numeric} value indicating scale in meters. 250 (default)}
 

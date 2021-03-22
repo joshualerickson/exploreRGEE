@@ -57,16 +57,22 @@ return(list(reg = reg, geom = geom, aoi = aoi))
 
 # function for setting up function and geom with a GEE FeatureCollection
 
+geeFC_setup_aoi <- function(aoi, geeFC){
+
+  geom <- setup(aoi)
+  reg <- ee$FeatureCollection(geeFC)
+  reg <- reg$filterBounds(geom)
+  aoi <- rgee::ee_as_sf(reg)
+  return(list(aoi = aoi, geom = geom))
+}
+
 geeFC_setup <- function(aoi, geeFC){
 
   geom <- setup(aoi)
 
   reg <- ee$FeatureCollection(geeFC)
   reg <- reg$filterBounds(geom)
-
-  #aoi <- rgee::ee_as_sf(reg)
-
-  return(list(reg = reg, geom = geom, aoi = aoi))
+  return(list(reg = reg, geom = geom))
 }
 
 

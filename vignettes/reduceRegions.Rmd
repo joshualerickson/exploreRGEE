@@ -3,7 +3,7 @@ title: "Using rr"
 author: "Josh Erickson"
 date: "3/6/2021"
 vignette: >
-  %\VignetteIndexEntry{2. Using viz}
+  %\VignetteIndexEntry{2. Reduce Regions}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

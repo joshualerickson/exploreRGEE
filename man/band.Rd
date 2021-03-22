@@ -10,6 +10,7 @@ band(
   scale,
   band = NULL,
   temporal = "yearly",
+  stat = "median",
   lazy = FALSE,
   fun = ee$Reducer$median(),
   variable = NULL,
@@ -27,6 +28,8 @@ band(
 \item{band}{A \code{character} indicating what bands/type to use when you have more than one.}
 
 \item{temporal}{A \code{character} indicating what temporal filter to use on the collection, e.g. 'yearly' (default), 'monthly', 'year_month', 'all'.}
+
+\item{stat}{A \code{character} indicating what to reduce the imageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
 \item{lazy}{\code{logical} whether to run a 'sequential' future in the background or not.}
 

@@ -7,6 +7,7 @@
 #' @param scale \code{numeric} value indicating what to reduce the regions by, e.g. 800 (m) default.
 #' @param band A \code{character} indicating what bands/type to use when you have more than one.
 #' @param temporal A \code{character} indicating what temporal filter to use on the collection, e.g. 'yearly' (default), 'monthly', 'year_month', 'all'.
+#' @param stat A \code{character} indicating what to reduce the imageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
 #' @param lazy \code{logical} whether to run a 'sequential' future in the background or not.
 #' @param fun A earth engine reducer, e.g. ee$Reducer$median() (default).
 #' @param variable \code{character} indicating what to facet ggplot by. Need to know ahead of time.
@@ -45,24 +46,28 @@
 #'
 #' }
 
-band <- function(data, geeFC = NULL, scale, band = NULL, temporal = 'yearly', lazy = FALSE,  fun = ee$Reducer$median(), variable = NULL, ggplot = FALSE, save.plot = F) {
+band <- function(data, geeFC = NULL, scale, band = NULL,
+                 temporal = 'yearly', stat = 'median', lazy = FALSE,
+                 fun = ee$Reducer$median(), variable = NULL,
+                 ggplot = FALSE, save.plot = F) {
 
   if(missing(data)){stop("Need a get_* object to use this function")}
 if(class(data) == 'diff_list' | class(data) == 'terrain_list' | class(data) == 'ee.image.Image'){stop("Can't band with this type of list")}
 if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correct temporal argument")}
 
   # dissecting the passed get_*() object
-  aoi <- data$aoi
-  imageCol <- data$imageCol
-  image <- data$data
-  geom <- data$geom
-  stat <- data$stat
-  method <- data$method
-  param <- data$param
-  startDate <- data$startDate
-  endDate <- data$endDate
-  c.low <- data$c.low
-  c.high <- data$c.high
+
+    aoi <- data$aoi
+    imageCol <- data$imageCol
+    startDate <- data$startDate
+    endDate <- data$endDate
+    imageCol <- data$imageCol
+    image <- data$data
+    geom <- data$geom
+    method <- data$method
+    param <- data$param
+    c.low <- data$c.low
+    c.high <- data$c.high
 
 
   if(is.null(param) & is.null(band))stop({"Need to choose a band name."})
@@ -76,15 +81,15 @@ if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correc
 
   if(temporal == 'yearly'){
 
-    imageCol <- year_filter(startDate = startDate, endDate = endDate,imageCol = imageCol)
+    imageCol <- year_filter(startDate = startDate, endDate = endDate,imageCol = imageCol, stat = stat)
 
   } else if (temporal == 'monthly'){
 
-    imageCol <- month_filter(c.low = c.low, c.high = c.high,imageCol = imageCol)
+    imageCol <- month_filter(c.low = c.low, c.high = c.high,imageCol = imageCol, stat = stat)
 
   } else if (temporal == 'year_month') {
 
-    imageCol <- year_month_filter(startDate = startDate, endDate = endDate,c.low = c.low, c.high = c.high,imageCol = imageCol)
+    imageCol <- year_month_filter(startDate = startDate, endDate = endDate,c.low = c.low, c.high = c.high,imageCol = imageCol, stat = stat)
 
   } else if (temporal == 'all'){
 
@@ -96,16 +101,22 @@ if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correc
 
   } else {
 
-    reg <- geeFC_setup(aoi, geeFC)
+    if (isTRUE(lazy)){
 
-  }
+    reg <- geeFC_setup_aoi(aoi, geeFC)
+
+    } else {
+
+      reg <- geeFC_setup(aoi, geeFC)
+
+  }}
 
   if(isTRUE(lazy)){
     prev_plan <- future::plan(future::sequential, .skip = TRUE)
     on.exit(future::plan(prev_plan, .skip = TRUE), add = TRUE)
     future::future({
 
-      fut_band_func(imageCol = imageCol, data = data, reg = reg$aoi, fun = fun, scale = scale, param = param, method = method, tmp_type = temporal)
+      fut_band_func(imageCol = imageCol, data = data, reg = reg, fun = fun, scale = scale, param = param, method = method, tmp_type = temporal)
 
     }, lazy = TRUE)
 
@@ -126,9 +137,10 @@ if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correc
 
 fut_band_func <- function(imageCol, data, reg, fun, scale, param, method, tmp_type){
 
-  n_lists <- nrow(reg)/10
 
-  reggy <- reg %>%
+  n_lists <- nrow(reg$aoi)/10
+
+  reggy <- reg$aoi %>%
     dplyr::group_by((dplyr::row_number()-1) %/% (dplyr::n()/n_lists))%>%
     tidyr::nest() %>% dplyr::pull(data)
 
@@ -150,6 +162,8 @@ fut_band_func <- function(imageCol, data, reg, fun, scale, param, method, tmp_ty
     proc <- getting_proc(data = data, proc = proc, param_name = param_name, method = method, tmp_type = tmp_type)
 
     final_proc <- plyr::rbind.fill(proc, final_proc)
+
+    Sys.sleep(1/100)
 
   }
 

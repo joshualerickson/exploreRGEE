@@ -99,7 +99,7 @@ provide the appropriate arguments.
 ``` r
 lincoln_county <- AOI::aoi_get(state = "Montana", county = "Lincoln")
 
-npp <- get_npp(lincoln_county, method = 'cloud_mask', param = 'annualNPP', stat = 'median', startDate = '1986-01-01', endDate = '2016-01-01')
+npp <- get_npp(lincoln_county, method = 'ld_NPP', param = 'annualNPP', stat = 'median', startDate = '1986-01-01', endDate = '2016-01-01')
 ```
 
 <br>

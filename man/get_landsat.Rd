@@ -24,7 +24,7 @@ get_landsat(
 
 \item{method}{A \code{character} indicating what method to use, e.g. 'ld8', 'ld7', 'ld5', 'ld4', 'ts', 'harm_ts'.}
 
-\item{param}{A \code{character} indicating what band to visualize, e.g. 'Blue' or c('Green', 'Red', 'NIR') or nothing returns all bands.}
+\item{param}{A \code{character} indicating what band to visualize, e.g. 'Blue' or c('Green', 'Red', 'NIR') or NULL returns all bands.}
 
 \item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
@@ -49,8 +49,9 @@ A list of Earth Engine Objects and arguments.
 }
 \description{
 This function gets 30-m USGS Landsat 8, 7 , 5 and 4 (Surface Reflectance Tier 1 (SR))
-satellite images from various bands. The image processing for time series can either use methods by Roy et al. (2016) and Zhu et al. (2015) (e.g. harmonization and cloud-masking) so that all three Landsat
-missions could be used for time series analysis ('harm_ts') or you can just get time series without harmonizing ('ts').
+satellite images from various bands. The image processing for time series can either use methods by Roy et al. (2016) (e.g. harmonization) so that all three Landsat
+missions will be scaled for a harmonized time series analysis ('harm_ts') or you can just get time series without harmonizing ('ts'). All the methods will use
+Zhu et al. (2015) masking function and filter image properties by cloud cover less than 50\% and Geometric RMSE Model less than 10.
 }
 \details{
 The methods currently available (more to come):

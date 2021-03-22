@@ -1,6 +1,6 @@
 #' Viz-ualize GEE Image/ImageCollections
 #' @description This function allows users to quickly view a previously created get_*() object.
-#' @param data A previously created get_* object
+#' @param data A previously created get_* object or ee.image.Image
 #' @param scale A \code{numeric} value indicating scale in meters. 250 (default)
 #' @param band A \code{character} indicating what bands/type to use when you have more than one. Can select more than one, e.g. c('Red', 'Green', 'Blue').
 #' @param palette \code{character} color palette using colorBrewer format, e.g. "RdBu" (default), "RdYlGn", etc.
@@ -81,11 +81,11 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 6, rev
 
     }
 
-    if(length(param) > 1 || class(data) == 'diff_list'){
+    if(length(param) > 1 || class(data) == 'diff_list' || class(data) == 'linear_list'){
 
       id_tag <- paste0(method, ' - ',stat, "; " ,startDate, " - ", endDate)
 
-      m1 <- leaf_call(data = image, geom = geom, min = min, max = max, palette = NULL,
+      m1 <- leaf_call(data = data, image = image, geom = geom, min = min, max = max, palette = NULL,
                       id_tag = id_tag, bbox = bbox, reverse = NULL, n_pal = NULL, bands = param, gamma = gamma, opacity = opacity)
 
     } else {
@@ -102,7 +102,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 6, rev
 
     #need to make better
 
-    if(is.null(min) | is.null(max)){
+    if(is.null(min) || is.null(max)){
 
       min <- stats$getInfo()$features[[1]]$properties$min
       max <- stats$getInfo()$features[[1]]$properties$max
@@ -123,7 +123,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 6, rev
 
     id_tag <- paste0(method, ' - ', param, ' ',stat, "; " ,startDate, " - ", endDate)
 
-    m1 <- leaf_call(data = image, min = min, max = max, palette = palette,bands = param, id_tag = id_tag, bbox = bbox, geom = geom, reverse = reverse, n_pal = n_pal, gamma = gamma, opacity = opacity)
+    m1 <- leaf_call(data = data, image = image, min = min, max = max, palette = palette,bands = param, id_tag = id_tag, bbox = bbox, geom = geom, reverse = reverse, n_pal = n_pal, gamma = gamma, opacity = opacity)
 
   }
 
@@ -151,7 +151,7 @@ Pal <- function(pal, reverse, n_pal) {
 
 # leaflet mapping function
 
-leaf_call <- function(data, geom, min, max, palette, id_tag, bbox, reverse, n_pal, bands, gamma, opacity){
+leaf_call <- function(data,image, geom, min, max, palette, id_tag, bbox, reverse, n_pal, bands, gamma, opacity){
 
     rgee::Map$setCenter(bbox[1], bbox[2], 6)
 
@@ -166,13 +166,13 @@ leaf_call <- function(data, geom, min, max, palette, id_tag, bbox, reverse, n_pa
 
 if(length(bands) > 1){
 
-  mLayer <- rgee::Map$addLayer(data$clip(geom), visParams = list(bands = bands, min = min, max = max, gamma = gamma), id_tag, opacity = opacity)
+  mLayer <- rgee::Map$addLayer(image$clip(geom), visParams = list(bands = bands, min = min, max = max, gamma = gamma), id_tag, opacity = opacity)
 
 
 } else {
 
 
-  mLayer <- rgee::Map$addLayer(data$clip(geom)$sldStyle(sld_intervals(data)), visParams = list(), id_tag, opacity = opacity)
+  mLayer <- rgee::Map$addLayer(image$clip(geom)$sldStyle(sld_intervals(data, min, max)), visParams = list(), id_tag, opacity = opacity)
 
 }
 
@@ -180,7 +180,7 @@ mLayer
 
     } else {
 
-    mLayer <- rgee::Map$addLayer(data$clip(geom),
+    mLayer <- rgee::Map$addLayer(image$clip(geom),
                            visParams = list(min = min, max = max, palette = Pal(palette, reverse, n_pal)), id_tag, opacity = opacity)
 }
     m1 <- mLayer %>%
@@ -195,8 +195,9 @@ mLayer
 
 # Sld styles for diff_list
 
+# this will get better with min/max args
 
-sld_intervals <- function(data){
+sld_intervals <- function(data, min, max){
 
 
     if(class(data) == 'met_list' || class(data) == 'npp_list'){
@@ -216,19 +217,64 @@ sld_intervals <- function(data){
     "</ColorMap>",
     "</RasterSymbolizer>"
   )
-} else {
+
+  } else if (class(data) == 'linear_list'){
+
+    if (min >= -1 && max <= 1){
+      paste0(
+        "<RasterSymbolizer>",
+        '<ColorMap  type="ramp" extended="false" >',
+        '<ColorMapEntry color="#A51122" quantity="-1" />',
+        '<ColorMapEntry color="#D94300" quantity="-0.5" />',
+        '<ColorMapEntry color="#E78200" quantity="-0.25" />',
+        '<ColorMapEntry color="#EFB446" quantity="-0.1" />',
+        '<ColorMapEntry color="#F6DE90" quantity="-0.05" />',
+        '<ColorMapEntry color="#000000" quantity="0" />',
+        '<ColorMapEntry color="#D7E88D" quantity="0.05" />',
+        '<ColorMapEntry color="#A2CC5B" quantity="0.1" />',
+        '<ColorMapEntry color="#6AAB44" quantity="0.25" />',
+        '<ColorMapEntry color="#338738" quantity="0.5" />',
+        '<ColorMapEntry color="#006228" quantity="1" />',
+        "</ColorMap>",
+        "</RasterSymbolizer>"
+      )
+
+    } else {
+       paste0(
+      "<RasterSymbolizer>",
+      '<ColorMap  type="ramp" extended="false" >',
+      '<ColorMapEntry color="#A51122" quantity="-300" />',
+      '<ColorMapEntry color="#D94300" quantity="-200" />',
+      '<ColorMapEntry color="#E78200" quantity="-100" />',
+      '<ColorMapEntry color="#EFB446" quantity="-25" />',
+      '<ColorMapEntry color="#F6DE90" quantity="-.5" />',
+      '<ColorMapEntry color="#000000" quantity="0" />',
+      '<ColorMapEntry color="#D7E88D" quantity="0.5" />',
+      '<ColorMapEntry color="#A2CC5B" quantity="25" />',
+      '<ColorMapEntry color="#6AAB44" quantity="100" />',
+      '<ColorMapEntry color="#338738" quantity="200" />',
+      '<ColorMapEntry color="#006228" quantity="300" />',
+      "</ColorMap>",
+      "</RasterSymbolizer>"
+    )
+
+    }
+
+  } else {
     paste0(
       "<RasterSymbolizer>",
       '<ColorMap  type="ramp" extended="false" >',
-      '<ColorMapEntry color="#B22222" quantity="-5" />',
-      '<ColorMapEntry color="#B22222" quantity="-3" />',
-      '<ColorMapEntry color="#B22222" quantity="-0.9" />',
-      '<ColorMapEntry color="#FF0000" quantity="-0.2" />',
+      '<ColorMapEntry color="#A51122" quantity="-30" />',
+      '<ColorMapEntry color="#D94300" quantity="-20" />',
+      '<ColorMapEntry color="#E78200" quantity="-10" />',
+      '<ColorMapEntry color="#EFB446" quantity="-2.5" />',
+      '<ColorMapEntry color="#F6DE90" quantity="-.5" />',
       '<ColorMapEntry color="#000000" quantity="0" />',
-      '<ColorMapEntry color="#008000" quantity="0.2" />',
-      '<ColorMapEntry color="#0000CD" quantity="0.9" />',
-      '<ColorMapEntry color="#B22222" quantity="3" />',
-      '<ColorMapEntry color="#B22222" quantity="5" />',
+      '<ColorMapEntry color="#D7E88D" quantity="0.5" />',
+      '<ColorMapEntry color="#A2CC5B" quantity="2.5" />',
+      '<ColorMapEntry color="#6AAB44" quantity="10" />',
+      '<ColorMapEntry color="#338738" quantity="20" />',
+      '<ColorMapEntry color="#006228" quantity="30" />',
       "</ColorMap>",
       "</RasterSymbolizer>"
     )

@@ -486,11 +486,11 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 
   if(method == "NED"){
 
-    dem <- rgee::ee$Image("USGS/NED")
+    dem <- rgee::ee$Image("USGS/NED")$resample('bicubic')
 
   } else if (method == "SRTM") {
 
-    dem = rgee::ee$Image("USGS/SRTMGL1_003")
+    dem = rgee::ee$Image("USGS/SRTMGL1_003")$resample('bicubic')
   }
 
 

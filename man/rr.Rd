@@ -20,7 +20,7 @@ rr(
 )
 }
 \arguments{
-\item{data}{A previously created get_* object}
+\item{data}{A previously created get_* object or ee.image.Image}
 
 \item{geeFC}{A known GEE FeatureCollection or asset, e.g. "USGS/WBD/2017/HUC12"}
 

@@ -14,7 +14,8 @@ navbar:
          href: articles/get_functions.html
       -  text: Vizualizing
          href: articles/vizualizing.html
-      -  text: Reducing Regions
+      -  text: Reduce Regions
+         href: articles/reduceRegions.html
       -  text: Time Series (band)
     - text: "reference"
       href: reference/index.html

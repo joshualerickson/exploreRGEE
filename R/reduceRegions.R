@@ -1,7 +1,7 @@
 #' Reduce Regions
 #' @description This function allows the user to pass a previously created get_*() object to get
 #' reduceRegions() by using \link[rgee]{ee_as_sf} function.
-#' @param data A previously created get_* object
+#' @param data A previously created get_* object or ee.image.Image
 #' @param geeFC A known GEE FeatureCollection or asset, e.g. "USGS/WBD/2017/HUC12"
 #' @param scale A \code{numeric} value indicating scale in meters
 #' @param tileScale \code{numeric} what to reduce regions by, 1 (default). Higher means slower but less memory, e.g. 5.
@@ -43,7 +43,8 @@
 #' ld8_ts <- ld8 %>% band(scale = 500, band = 'NDVI', leaflet = TRUE, variable = 'name')
 #'
 #' }
-rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FALSE, variable = NULL, leaflet = FALSE, palette = "RdBu", n_pal = 11, reverse = FALSE, user_shape = NULL){
+rr <- function(data, geeFC = NULL, scale, tileScale = 1,
+               band = NULL, lazy = FALSE, variable = NULL, leaflet = FALSE, palette = "RdBu", n_pal = 11, reverse = FALSE, user_shape = NULL){
 
   if(missing(scale))stop({"Please provide a scale to reduce region(s)."})
   if(missing(data))stop({"Need a previously created get_* object as 'data'."})
@@ -58,6 +59,8 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
     stat <- NULL
     startDate <- NULL
     endDate <- NULL
+    c.low <- NULL
+    c.high <- NULL
     bbox <- as.numeric(sf::st_bbox(aoi))
 
   } else {
@@ -121,23 +124,23 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
 
   if(leaflet == "TRUE") {
 
-    # this is subjective and could be axed for sure.
-
-    website <- function(){
-
-      if (class(data) == "landsat_list"){
-
-        '<a href = "https://www.usgs.gov/core-science-systems/nli/landsat/landsat-surface-reflectance-quality-assessment?qt-science_support_page_related_con=0#qt-science_support_page_related_con"> More Info </a>'
-
-        } else if (class(data) == "met_list" & method %in% c('AN81m', 'AN81d', 'Norm81m')){
-
-        '<a href = "https://prism.oregonstate.edu/documents/PRISM_datasets.pdf"> More Info </a>'
-
-        } else if (class(data) == "met_list" & method == 'GRIDMET'){
-
-          '<a href = "https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3413"> More Info </a>'
-        }
-    }
+    # # this is subjective and could be axed for sure.
+    #
+    # website <- function(){
+    #
+    #   if (class(data) == "landsat_list"){
+    #
+    #     '<a href = "https://www.usgs.gov/core-science-systems/nli/landsat/landsat-surface-reflectance-quality-assessment?qt-science_support_page_related_con=0#qt-science_support_page_related_con"> More Info </a>'
+    #
+    #     } else if (class(data) == "met_list" & method %in% c('AN81m', 'AN81d', 'Norm81m')){
+    #
+    #     '<a href = "https://prism.oregonstate.edu/documents/PRISM_datasets.pdf"> More Info </a>'
+    #
+    #     } else if (class(data) == "met_list" & method == 'GRIDMET'){
+    #
+    #       '<a href = "https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3413"> More Info </a>'
+    #     }
+    # }
 
     if(class(region_df$geometry[[1]])[[2]] != "POINT") {
 
@@ -155,8 +158,7 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
                                                                "<br>", "<b>", "Median: ", "</b>",round(region_df$median,3),
                                                                "<br>", "<b>", "Standard Deviation: ", "</b>",round(region_df$stdDev,3),
                                                                "<br>", "<b>", "Sum: ", "</b>",round(region_df$sum,3),
-                                                               "<br>",
-                                                               website()))
+                                                               "<br>"))
 
 
 
@@ -169,8 +171,7 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
                                                      popup = paste0("<b>", "Parameter: ", "</b>",paste0(param, " by ", stat),
                                                                     "<br>", "<b>", "Date Range: ", "</b>",paste0("Years: ",stringr::str_remove(startDate,"(-).*"), " - ", stringr::str_remove(endDate,"(-).*"), "; Months: ", c.low, " - ", c.high),
                                                                     "<br>", "<b>", "Value: ", "</b>",round(region_df$mean,3),
-                                                                    "<br>",
-                                                                    website()))
+                                                                    "<br>"))
 
 
     } #ending ifelse

@@ -32,7 +32,8 @@ Imports:
     shiny,
     leaflet.extras,
     mapview,
-    DT
+    DT,
+    shinyWidgets
 Depends: 
     R (>= 2.10)
 Suggests: knitr, AOI

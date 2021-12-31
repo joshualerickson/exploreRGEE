@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">exploreRGEE</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1</span>
       </span>
     </div>
 
@@ -49,7 +49,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    <span class="fas fa fas fa-book"></span>
+    <span class="fas fa-book"></span>
      
     Vignettes
      
@@ -62,6 +62,10 @@
     <li>
       <a href="../articles/vizualizing.html">Vizualizing</a>
     </li>
+    <li>
+      <a href="../articles/reduceRegions.html">Reduce Regions</a>
+    </li>
+    <li class="dropdown-header">Time Series (band)</li>
   </ul>
 </li>
 <li>
@@ -69,7 +73,7 @@
 </li>
 <li>
   <a href="https://github.com/joshualerickson/exploreRGEE/" class="external-link">
-    <span class="fa fa fa fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
     github
   </a>
@@ -84,7 +88,7 @@
 
       
 
-      </header><script src="reduceRegions_files/header-attrs-2.5/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using rr</h1>
@@ -92,17 +96,86 @@
             
             <h4 data-toc-skip class="date">3/6/2021</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/joshualerickson/exploreRGEE/blob/master/vignettes/reduceRegions.Rmd" class="external-link"><code>vignettes/reduceRegions.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/joshualerickson/exploreRGEE/blob/HEAD/vignettes/reduceRegions.Rmd" class="external-link"><code>vignettes/reduceRegions.Rmd</code></a></small>
       <div class="hidden name"><code>reduceRegions.Rmd</code></div>
 
     </div>
 
     
     
-<div id="intro" class="section level2">
-<h2 class="hasAnchor">
-<a href="#intro" class="anchor"></a>Intro</h2>
-<p>Sometimes a user may want to reduce a image to a region (e.g. zonal statistics) to gather some aggregated information. Earth Engine and rgee provide means to do this through the <code>reduceRegions()</code> function. In addition, rgee provides a function <code><a href="https://r-spatial.github.io/rgee//reference/ee_as_sf.html" class="external-link">ee_as_sf()</a></code> which let’s us easily get that information in the R session! However, there are a few steps that are needed before you get to this point; 1.) a reduced image, 2.) a reducer stat, 3). a feature to reduce on (geometry). Th</p>
+<div class="section level2">
+<h2 id="intro">Intro<a class="anchor" aria-label="anchor" href="#intro"></a>
+</h2>
+<p>Sometimes a user may want to reduce a image to a region (e.g. zonal statistics or point extraction) to gather some aggregated information. Earth Engine and rgee provide means to do this through the <code>reduceRegions()</code> function. In addition, rgee provides a function <code><a href="https://r-spatial.github.io/rgee/reference/ee_as_sf.html" class="external-link">ee_as_sf()</a></code> which let’s us easily get that information in the R session! However, there are a few steps that are needed before you get to this point; 1.) a reduced image, 2.) a reducer stat, 3). a feature to reduce on (geometry). This article will go through these steps using the <code><a href="../reference/rr.html">rr()</a></code> function.</p>
+</div>
+<div class="section level2">
+<h2 id="use-get">Use get<a class="anchor" aria-label="anchor" href="#use-get"></a>
+</h2>
+<p>First we’ll need to get an image that we’ll want to reduce on. We’ll use the <code><a href="../reference/get_landsat.html">get_landsat()</a></code> function, which will let us get an imageCollection as well as a final image. We’ll need to define a <code>geometry</code> aka area of interest (aoi) so that we can clip the imageCollection. To do this we’ll use the {mapedit}.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/mapedit" class="external-link">mapedit</a></span><span class="op">)</span>
+<span class="va">aoi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mapedit/man/drawFeatures.html" class="external-link">drawFeatures</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>From here we can start with the <code><a href="../reference/get_landsat.html">get_landsat()</a></code> function and get an image. Let’s use it with the {eemont} python package as well. The <a href="https://github.com/davemlz/eemont" class="external-link">{eemont}</a> is a really nice comprehensive python package that integrates a myriad of current, intuitive and user friendly earth engine processes.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshualerickson/exploreRGEE" class="external-link">exploreRGEE</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/rgee/" class="external-link">rgee</a></span><span class="op">)</span>
+<span class="fu"><a href="https://r-spatial.github.io/rgee/reference/ee_Initialize.html" class="external-link">ee_Initialize</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/reticulate" class="external-link">reticulate</a></span><span class="op">)</span>
+<span class="co">#py_install('eemont')</span>
+<span class="va">eemont</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/import.html" class="external-link">import</a></span><span class="op">(</span><span class="st">'eemont'</span><span class="op">)</span>
+
+<span class="va">get_ld8</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_landsat.html">get_landsat</a></span><span class="op">(</span>aoi <span class="op">=</span> <span class="va">aoi</span>,
+                     method <span class="op">=</span> <span class="st">'ld8'</span>,
+                     startDate <span class="op">=</span> <span class="st">'2018-01-01'</span>,
+                     endDate <span class="op">=</span> <span class="st">'2021-12-31'</span>,
+                     stat <span class="op">=</span> <span class="st">'median'</span>,
+                     cloud_mask <span class="op">=</span> <span class="cn">FALSE</span>,
+                     c.low <span class="op">=</span> <span class="fl">6</span>,
+                     c.high <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
+
+<span class="va">mont_ld8</span> <span class="op">&lt;-</span> <span class="va">get_ld8</span><span class="op">$</span><span class="va">imageCol</span><span class="op">$</span>
+                    <span class="fu">maskClouds</span><span class="op">(</span><span class="op">)</span><span class="op">$</span>
+                    <span class="fu">scale</span><span class="op">(</span><span class="op">)</span><span class="op">$</span>
+                    <span class="fu">spectralIndices</span><span class="op">(</span><span class="st">'kNDVI'</span><span class="op">)</span><span class="op">$</span>
+                    <span class="fu">median</span><span class="op">(</span><span class="op">)</span>
+<span class="co"># to visualize provide an area of interest to 'user_shape'</span>
+<span class="va">mont_ld8</span> <span class="op"><a href="https://r-spatial.github.io/rgee/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>band <span class="op">=</span> <span class="st">'kNDVI'</span>, min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">1</span>, user_shape <span class="op">=</span> <span class="va">aoi</span><span class="op">)</span></code></pre></div>
+<center>
+<strong>kNDVI</strong>
+</center>
+<p><img src="kndvi.png" width="50%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level2">
+<h2 id="rr">rr<a class="anchor" aria-label="anchor" href="#rr"></a>
+</h2>
+<p>Now that we have a image we can start to reduce that image by several parameters in earth engine: ‘max’, ‘mean’, ‘median’, ‘min’, ‘stdDev’, ‘sum’. The <code><a href="../reference/rr.html">rr()</a></code> function will reduce the region by these stats and return an sf object (aoi) with reduced regions.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rr_knvi</span> <span class="op">&lt;-</span> <span class="va">mont_ld8</span> <span class="op"><a href="https://r-spatial.github.io/rgee/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/rr.html">rr</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">30</span>,
+                           band <span class="op">=</span> <span class="st">'kNDVI'</span>,
+                           user_shape <span class="op">=</span> <span class="va">aoi</span><span class="op">)</span></code></pre></div>
+<p>We can also add the argument <code>leaflet = TRUE</code> to get a interactive map of the reduced region.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rr_knvi</span> <span class="op">&lt;-</span> <span class="va">mont_ld8</span> <span class="op"><a href="https://r-spatial.github.io/rgee/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/rr.html">rr</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">30</span>, 
+                           band <span class="op">=</span> <span class="st">'kNDVI'</span>,
+                           user_shape <span class="op">=</span> <span class="va">aoi</span>,
+                           leaflet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="rr_kndvi.png" width="50%" style="display: block; margin: auto;"></p>
+<p>This is nice but what if we wanted to use different areas of interest? Well, you have a few options; bring in a new spatial feature and start over or use an earth engine feature collection within the aoi. Below we’ll use the HUC12 feature collection in earth engine within our aoi.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rr_knvi</span> <span class="op">&lt;-</span> <span class="va">mont_ld8</span> <span class="op"><a href="https://r-spatial.github.io/rgee/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/rr.html">rr</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">30</span>,
+                           geeFC <span class="op">=</span> <span class="st">'USGS/WBD/2017/HUC12'</span>,
+                           band <span class="op">=</span> <span class="st">'kNDVI'</span>,
+                           user_shape <span class="op">=</span> <span class="va">aoi</span>,
+                           leaflet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="geeFC_kndvi.png" width="50%" style="display: block; margin: auto;"></p>
+<p>We can also just use point geometries.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">rr_knvi_pts</span> <span class="op">&lt;-</span> <span class="va">mont_ld8</span> <span class="op"><a href="https://r-spatial.github.io/rgee/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/rr.html">rr</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">30</span>,
+                           band <span class="op">=</span> <span class="st">'kNDVI'</span>,
+                           user_shape <span class="op">=</span> <span class="va">points_sf</span>,
+                           leaflet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="pts_kndvi.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
   </div>
 
@@ -123,7 +196,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
 </div>
 
       </footer>

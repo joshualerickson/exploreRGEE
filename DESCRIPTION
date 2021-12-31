@@ -1,5 +1,5 @@
 Package: exploreRGEE
-Title: Explores Google Earth Engine
+Title: Explore Google Earth Engine in R
 Version: 0.1
 Authors@R: 
     person(given = "Josh",

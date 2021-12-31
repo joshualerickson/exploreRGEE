@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">exploreRGEE</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1</span>
       </span>
     </div>
 
@@ -49,7 +49,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    <span class="fas fa fas fa-book"></span>
+    <span class="fas fa-book"></span>
      
     Vignettes
      
@@ -62,7 +62,9 @@
     <li>
       <a href="../articles/vizualizing.html">Vizualizing</a>
     </li>
-    <li class="dropdown-header">Reducing Regions</li>
+    <li>
+      <a href="../articles/reduceRegions.html">Reduce Regions</a>
+    </li>
     <li class="dropdown-header">Time Series (band)</li>
   </ul>
 </li>
@@ -71,7 +73,7 @@
 </li>
 <li>
   <a href="https://github.com/joshualerickson/exploreRGEE/" class="external-link">
-    <span class="fa fa fa fa-github fa-lg"></span>
+    <span class="fa fa-github fa-lg"></span>
      
     github
   </a>
@@ -86,7 +88,7 @@
 
       
 
-      </header><script src="vizualizing_files/header-attrs-2.5/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using viz</h1>
@@ -94,33 +96,33 @@
             
             <h4 data-toc-skip class="date">3/6/2021</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/joshualerickson/exploreRGEE/blob/master/vignettes/vizualizing.Rmd" class="external-link"><code>vignettes/vizualizing.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/joshualerickson/exploreRGEE/blob/HEAD/vignettes/vizualizing.Rmd" class="external-link"><code>vignettes/vizualizing.Rmd</code></a></small>
       <div class="hidden name"><code>vizualizing.Rmd</code></div>
 
     </div>
 
     
     
-<div id="intro" class="section level2">
-<h2 class="hasAnchor">
-<a href="#intro" class="anchor"></a>Intro</h2>
+<div class="section level2">
+<h2 id="intro">Intro<a class="anchor" aria-label="anchor" href="#intro"></a>
+</h2>
 <p>This vignette will go over the different capabilities of the <code><a href="../reference/viz.html">viz()</a></code> function. The main purpose of <code><a href="../reference/viz.html">viz()</a></code> is to vizualize earth engine Images quickly. To do that, we need to either know the Image range prior (-1 to 1) or we need to calculate some quick stats (min and max) or my favorite, guess. The former is the fastest and works well for normalized indices (NDVI, NDWI) but when dealing with other Images it’s not as clear cut. This leads to continuously using infamous getInfo() function from GEE on the side to find these parameters when exploring. However, the <code><a href="../reference/viz.html">viz()</a></code> function will run getInfo() in the background for you if <code>min</code> and <code>max</code> are not provided. In addition, the process to get the info can take a long time depending on the scale; thus, the scale is set high (250 meters) but it may make sense to make it even larger for faster processing or when dealing with coarser pixels, e.g. PRISM is 800m. The reason for this is that earth engine defaults to a 0 to 255 scale when no min or max value is given. Thus, <code><a href="../reference/viz.html">viz()</a></code> will help us do that quickly as shown in the examples below.</p>
 </div>
-<div id="vizualizing" class="section level2">
-<h2 class="hasAnchor">
-<a href="#vizualizing" class="anchor"></a>Vizualizing</h2>
+<div class="section level2">
+<h2 id="vizualizing">Vizualizing<a class="anchor" aria-label="anchor" href="#vizualizing"></a>
+</h2>
 <p>Let’s say we wanted to vizualize some remote sensing bands so that we can possibly extract some more meaningful variables in a ML model, i.e. say predicting stream occurrence. To do that, earth engine does the heavy lifting by providing remote sensing images (and <a href="https://github.com/r-spatial/rgee" class="external-link">rgee</a>) but we still need to be able to explore in a relatively quick manner. That’s where the <code>get_*()</code> along with <code><a href="../reference/viz.html">viz()</a></code> come into play.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/joshualerickson/exploreRGEE" class="external-link">exploreRGEE</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mikejohnson51/AOI/" class="external-link">AOI</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/rgee/" class="external-link">rgee</a></span><span class="op">)</span>
-<span class="fu"><a href="https://r-spatial.github.io/rgee//reference/ee_Initialize.html" class="external-link">ee_Initialize</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## -- rgee 1.0.8.9999 ---------------------------------- earthengine-api 0.1.249 -- 
-##  v email: not_defined
-##  v Initializing Google Earth Engine:
- v Initializing Google Earth Engine:  DONE!
-## 
- v Earth Engine user: users/joshualerickson 
+<span class="fu"><a href="https://r-spatial.github.io/rgee/reference/ee_Initialize.html" class="external-link">ee_Initialize</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## --  [1mrgee 1.1.2.9000 [22m ---------------------------------- earthengine-api 0.1.264 -- 
+##   [32mv [39m  [34muser: [39m  [32mnot_defined
+##  [39m  [32mv [39m  [34mInitializing Google Earth Engine: [39m
+  [32mv [39m  [34mInitializing Google Earth Engine: [39m  [32m DONE!
+##  [39m
+  [32mv [39m  [34mEarth Engine account: [39m  [32m [1musers/joshualerickson [22m [39m 
 ## --------------------------------------------------------------------------------</code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">huc</span> <span class="op">&lt;-</span> <span class="fu">exploreRGEE</span><span class="fu">::</span><span class="va"><a href="../reference/huc.html">huc</a></span>
@@ -129,24 +131,24 @@
                    c.low <span class="op">=</span> <span class="fl">7</span>, c.high <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
 <p>After processing the data we can now vizualize in a leaflet map.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ld8</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## Error in viz(.): Need to choose a band name.</code></pre>
+<code class="sourceCode R"><span class="va">ld8</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## Error in viz(.): Need to choose a band name.</span></code></pre>
 <p>If you get this error it’s because you didn’t specify the band you want to use for vizualizing. You can either put a character (see below), numeric (band = 1) or c(‘NIR’, ‘Green’, ‘Blue’). In addition, you can also call it in the <code>param</code> argument when you start but I’d recommend keeping all the bands. One reason to keep all bands is if you want to look at RGB or false-color composite or switch between bands quickly in the <code><a href="../reference/rr.html">rr()</a></code> and <code><a href="../reference/band.html">band()</a></code> functions.</p>
 <p><strong>False Color</strong></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ld8</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">3000</span>, band <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'NIR'</span>, <span class="st">'Green'</span>, <span class="st">'Blue'</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">ld8</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">3000</span>, band <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'NIR'</span>, <span class="st">'Green'</span>, <span class="st">'Blue'</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="false_color.png" width="50%" style="display: block; margin: auto;"><strong>True Color</strong> -play with gamma to lighten up image.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ld8</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">3000</span>, band <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Red'</span>, <span class="st">'Green'</span>, <span class="st">'Blue'</span><span class="op">)</span>, gamma <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">ld8</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">3000</span>, band <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Red'</span>, <span class="st">'Green'</span>, <span class="st">'Blue'</span><span class="op">)</span>, gamma <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
 <p><img src="natural_color.png" width="50%" style="display: block; margin: auto;"><strong>NDVI</strong></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ld8</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>band <span class="op">=</span> <span class="st">'NDVI'</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">ld8</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>band <span class="op">=</span> <span class="st">'NDVI'</span><span class="op">)</span></code></pre></div>
 <p><img src="viz_fig1.png" width="50%" style="display: block; margin: auto;"></p>
 <p><strong>Change Palette</strong></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># palettes use hcl.pals()</span>
 
-<span class="va">ld8</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>band <span class="op">=</span> <span class="st">"NDVI"</span>, min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">1</span>, 
+<span class="va">ld8</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>band <span class="op">=</span> <span class="st">"NDVI"</span>, min <span class="op">=</span> <span class="fl">0</span>, max <span class="op">=</span> <span class="fl">1</span>, 
             palette <span class="op">=</span> <span class="st">'RdYlGn'</span><span class="op">)</span></code></pre></div>
 <p><img src="viz_fig2.png" width="50%" style="display: block; margin: auto;"></p>
 <p>Now let’s say we want to look at the standard deviation. We’ll just grab the landsat image from above and change the <code>stat</code> argument. An important note is that if you use <code>stdDev</code> you have to explicitly call the <code>param</code> argument in the <code>get_*()</code>. Here, we changed the palette and reversed the order of that palette.</p>
@@ -156,14 +158,14 @@
                    startDate <span class="op">=</span> <span class="st">'2014-01-01'</span>, endDate <span class="op">=</span> <span class="st">'2019-12-31'</span>,
                    c.low <span class="op">=</span> <span class="fl">7</span>, c.high <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ld8</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">30</span>, palette <span class="op">=</span> <span class="st">'Spectral'</span>, reverse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </code></pre></div>
+<code class="sourceCode R"><span class="va">ld8</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fl">30</span>, palette <span class="op">=</span> <span class="st">'Spectral'</span>, reverse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </code></pre></div>
 <p><img src="viz_fig3.png" width="50%" style="display: block; margin: auto;"></p>
 <p>We can also use <code><a href="../reference/viz.html">viz()</a></code> to help us vizualize differences in images. Let’s look at the states Montana and Idaho and see what the difference from 2000-2009 to 2010-2019 would be for precipitation using GRIDMET. When using the <code><a href="../reference/get_diff.html">get_diff()</a></code> with <code><a href="../reference/viz.html">viz()</a></code> we will get some color intervals for the difference calculations. Black meaning near zero, red (negative), green/blue (positive).</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">aoi</span> <span class="op">&lt;-</span> <span class="fu">AOI</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/AOI/man/aoi_get.html" class="external-link">aoi_get</a></span><span class="op">(</span>state <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Montana'</span>, <span class="st">'Idaho'</span><span class="op">)</span><span class="op">)</span>
 <span class="va">prism</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_met.html">get_met</a></span><span class="op">(</span><span class="va">aoi</span>, method <span class="op">=</span> <span class="st">'GRIDMET'</span>, startDate <span class="op">=</span> <span class="st">'2000-01-01'</span>, endDate <span class="op">=</span> <span class="st">'2009-12-31'</span>, param <span class="op">=</span> <span class="st">'pr'</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/get_diff.html">get_diff</a></span><span class="op">(</span><span class="va">prism</span>, startDate2 <span class="op">=</span> <span class="st">'2010-01-01'</span>, endDate2 <span class="op">=</span> <span class="st">'2019-12-31'</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/get_diff.html">get_diff</a></span><span class="op">(</span><span class="va">prism</span>, startDate2 <span class="op">=</span> <span class="st">'2010-01-01'</span>, endDate2 <span class="op">=</span> <span class="st">'2019-12-31'</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="viz_fig4.png" width="50%" style="display: block; margin: auto;"></p>
 <p>Or if we want to look at the difference of landsat <strong>NDVI</strong> for the same time period you can do that as well.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -171,7 +173,7 @@
                     startDate <span class="op">=</span> <span class="st">'2000-01-01'</span>, endDate <span class="op">=</span> <span class="st">'2009-12-31'</span>,
                    c.low <span class="op">=</span> <span class="fl">7</span>, c.high <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/get_diff.html">get_diff</a></span><span class="op">(</span><span class="va">ld_ts</span>, startDate2 <span class="op">=</span> <span class="st">'2010-01-01'</span>, endDate2 <span class="op">=</span> <span class="st">'2019-12-31'</span>,band <span class="op">=</span> <span class="st">"NDVI"</span> <span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/get_diff.html">get_diff</a></span><span class="op">(</span><span class="va">ld_ts</span>, startDate2 <span class="op">=</span> <span class="st">'2010-01-01'</span>, endDate2 <span class="op">=</span> <span class="st">'2019-12-31'</span>,band <span class="op">=</span> <span class="st">"NDVI"</span> <span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="viz_fig5.png" width="50%" style="display: block; margin: auto;"></p>
 <p>Finally, you can always use a class ‘ee.image.Image’ with <code><a href="../reference/viz.html">viz()</a></code>. For example, let’s use the <a href="https://github.com/davemlz/eemont" class="external-link">eemont</a> processing steps and then vizualize.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -183,7 +185,7 @@
 <span class="va">ld8</span> <span class="op">&lt;-</span> <span class="va">ee</span><span class="op">$</span><span class="fu">ImageCollection</span><span class="op">(</span><span class="st">"LANDSAT/LC08/C01/T1_SR"</span><span class="op">)</span><span class="op">$</span><span class="fu">filterBounds</span><span class="op">(</span><span class="va">aoi</span><span class="op">)</span>
 <span class="va">ld8</span> <span class="op">&lt;-</span> <span class="va">ld8</span><span class="op">$</span><span class="fu">maskClouds</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">scale</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">index</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'GNDVI'</span>,<span class="st">'NDWI'</span>,<span class="st">'BAI'</span>,<span class="st">'NDSI'</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="fu">median</span><span class="op">(</span><span class="op">)</span>
 
-<span class="va">ld8</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>user_shape <span class="op">=</span> <span class="va">huc</span>, band <span class="op">=</span> <span class="st">'NDWI'</span><span class="op">)</span></code></pre></div>
+<span class="va">ld8</span> <span class="op"><a href="https://rdrr.io/pkg/AOI/man/grapes-greater-than-grapes.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/viz.html">viz</a></span><span class="op">(</span>user_shape <span class="op">=</span> <span class="va">huc</span>, band <span class="op">=</span> <span class="st">'NDWI'</span><span class="op">)</span></code></pre></div>
 <p><strong>NDWI</strong> <img src="viz_fig6.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
   </div>
@@ -205,7 +207,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
 </div>
 
       </footer>

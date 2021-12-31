@@ -1,57 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/index.html</loc>
+    <loc>/404.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/aoi_draw.html</loc>
+    <loc>/articles/get_functions.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/band.html</loc>
+    <loc>/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/get_any.html</loc>
+    <loc>/articles/reduceRegions.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/get_diff.html</loc>
+    <loc>/articles/vizualizing.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/get_landsat.html</loc>
+    <loc>/authors.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/get_met.html</loc>
+    <loc>/index.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/get_nex.html</loc>
+    <loc>/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/get_npp.html</loc>
+    <loc>/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/get_sent2.html</loc>
+    <loc>/reference/aoi_draw.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/get_terrain.html</loc>
+    <loc>/reference/band.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/huc.html</loc>
+    <loc>/reference/get_any.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/rr.html</loc>
+    <loc>/reference/get_diff.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/viz.html</loc>
+    <loc>/reference/get_landsat.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/reference/viz_A.html</loc>
+    <loc>/reference/get_met.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/articles/get_functions.html</loc>
+    <loc>/reference/get_npp.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/articles/reduceRegions.html</loc>
+    <loc>/reference/get_sent2.html</loc>
   </url>
   <url>
-    <loc>https://joshualerickson.github.io/exploreRGEE/articles/vizualizing.html</loc>
+    <loc>/reference/get_terrain.html</loc>
+  </url>
+  <url>
+    <loc>/reference/huc.html</loc>
+  </url>
+  <url>
+    <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rr.html</loc>
+  </url>
+  <url>
+    <loc>/reference/viz.html</loc>
+  </url>
+  <url>
+    <loc>/reference/viz_A.html</loc>
   </url>
 </urlset>

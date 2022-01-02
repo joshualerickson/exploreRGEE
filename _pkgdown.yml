@@ -17,6 +17,7 @@ navbar:
       -  text: Reduce Regions
          href: articles/reduceRegions.html
       -  text: Time Series (band)
+         href: articles/band.html
     - text: "reference"
       href: reference/index.html
     - icon: fa fa-github fa-lg

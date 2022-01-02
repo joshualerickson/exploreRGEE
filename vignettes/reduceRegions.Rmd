@@ -36,7 +36,6 @@ get_ld8 <- get_landsat(aoi = aoi,
                      method = 'ld8',
                      startDate = '2018-01-01',
                      endDate = '2021-12-31',
-                     stat = 'median',
                      cloud_mask = FALSE,
                      c.low = 6,
                      c.high = 10)

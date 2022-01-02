@@ -4,10 +4,10 @@
 \alias{aoi_draw}
 \title{AOI Draw}
 \usage{
-aoi_draw(user_shape = NULL, ...)
+aoi_draw(user_geom = NULL, ...)
 }
 \arguments{
-\item{user_shape}{A provided sf object to view alongside map.}
+\item{user_geom}{A provided sf object to view alongside map.}
 
 \item{...}{additional arguments for mapview.}
 }
@@ -33,7 +33,7 @@ aoi_draw()
 
 # with
 
-aoi_draw(user_shape = huc)
+aoi_draw(user_geom = huc)
 }
 
 }

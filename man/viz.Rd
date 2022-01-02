@@ -15,7 +15,7 @@ viz(
   max = NULL,
   gamma = NULL,
   opacity = NULL,
-  user_shape = NULL,
+  user_geom = NULL,
   ...
 )
 }
@@ -40,7 +40,7 @@ viz(
 
 \item{opacity}{\code{numeric} transparent display value.}
 
-\item{user_shape}{A sf object to use as 'aoi/geom' for an 'ee.image.Image'.}
+\item{user_geom}{A sf object to use as 'aoi/geom' for an 'ee.image.Image'.}
 
 \item{...}{additional arguments for mapview.}
 }

@@ -16,7 +16,7 @@ rr(
   palette = "RdBu",
   n_pal = 11,
   reverse = FALSE,
-  user_shape = NULL
+  user_geom = NULL
 )
 }
 \arguments{
@@ -42,7 +42,7 @@ rr(
 
 \item{reverse}{\code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).}
 
-\item{user_shape}{A sf object to use as 'region' for an 'ee.image.Image'.}
+\item{user_geom}{A sf object to use as 'region' for an 'ee.image.Image'.}
 }
 \value{
 A leaflet map (leaflet = TRUE) and always a sf object.
@@ -53,7 +53,7 @@ reduceRegions() by using \link[rgee]{ee_as_sf} function.
 }
 \note{
 If lazy is TRUE, the function will be run in the background. If the pixel size is big then please adjust tileScale
-to account for memory. This will not effect zonal stats (pixel size) but will just take longer. user_shape in this function
+to account for memory. This will not effect zonal stats (pixel size) but will just take longer. user_geom in this function
 is used when applying a non-get_*() function to rr(); this means you can provide a 'ee.image.Image' and a sf object to run rr().
 }
 \examples{

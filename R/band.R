@@ -7,14 +7,20 @@
 #' @param scale \code{numeric} value indicating what to reduce the regions by, e.g. 800 (m) default.
 #' @param band A \code{character} indicating what bands/type to use when you have more than one.
 #' @param temporal A \code{character} indicating what temporal filter to use on the collection, e.g. 'yearly' (default), 'monthly', 'year_month', 'all'.
-#' @param stat A \code{character} indicating what to reduce the imageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param stat A \code{character} indicating what to reduce the ImageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
 #' @param lazy \code{logical} whether to run a 'sequential' future in the background or not.
 #' @param fun A earth engine reducer, e.g. ee$Reducer$median() (default).
 #' @param variable \code{character} indicating what to facet ggplot by. Need to know ahead of time.
 #' @param ggplot \code{logical} TRUE/FALSE. Whether to print side-effect ggplot. See details.
 #' @param save.plot \code{logical} TRUE/FALSE. Whether to save the plot in a list, e.g. data + ggplot.
-#' @note Goal is to add more capabilities to this function in the future by using map() server-side, e.g. monthly and annual filters. Faster with points or centroids of polygons.
-#' If lazy is TRUE, the function will be run in the background.
+#' @param user_geom \code{logical} TRUE/FALSE.
+#' @param startDate \code{character} format date, e.g. "2018-10-23". NULL (default)
+#' @param endDate \code{character} format date, e.g. "2018-10-23". NULL (default)
+#' @param c.low \code{numeric} lower month value for calendar range. NULL (default)
+#' @param c.high \code{numeric} higher month value for calendar range. NULL (default)
+#' @note Additional arguments to pass if using a ImageCollection without get_*()'s are the startDate, endDate, c.low and c.high arguments.
+#' Faster with points or centroids of polygons.
+#' If lazy is TRUE, the function will be run in the background using a for-loop.
 #' @return A \code{data.frame} and a side-effect plot (if ggplot = TRUE); unless using \code{save.plot} then a list with \code{data.frame} and ggplot.
 #' @importFrom rlang .data
 #' @export
@@ -49,27 +55,39 @@
 band <- function(data, geeFC = NULL, scale, band = NULL,
                  temporal = 'yearly', stat = 'median', lazy = FALSE,
                  fun = ee$Reducer$median(), variable = NULL,
-                 ggplot = FALSE, save.plot = F) {
-
-  if(missing(data)){stop("Need a get_* object to use this function")}
-if(class(data) == 'diff_list' | class(data) == 'terrain_list' | class(data) == 'ee.image.Image'){stop("Can't band with this type of list")}
+                 ggplot = FALSE, save.plot = F, user_geom = NULL, startDate = NULL,
+                 endDate = NULL, c.low = NULL, c.high = NULL) {
+# error catching
+  if(missing(data)){stop("Need a get_* object or ImageCollection to use this function")}
+if(any(class(data) == 'diff_list' | class(data) == 'terrain_list' | class(data) == 'ee.image.Image')){stop("Can't band with this type of list")}
 if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correct temporal argument")}
-
+  if(class(data)[[1]] == "ee.imagecollection.ImageCollection" & is.null(user_geom)){stop("Need a user geom if using ImageCollection")}
   # dissecting the passed get_*() object
+if(class(data)[[1]] == "ee.imagecollection.ImageCollection"){
 
+  aoi <- user_geom %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
+  imageCol <- data
+  geom <- setup(aoi)
+  method <- NULL
+  param <- NULL
+  startDate <- startDate
+  endDate <- endDate
+  c.low <- c.low
+  c.high <- c.high
+
+
+} else {
     aoi <- data$aoi
     imageCol <- data$imageCol
     startDate <- data$startDate
     endDate <- data$endDate
-    imageCol <- data$imageCol
-    image <- data$data
     geom <- data$geom
     method <- data$method
     param <- data$param
     c.low <- data$c.low
     c.high <- data$c.high
 
-
+}
   if(is.null(param) & is.null(band))stop({"Need to choose a band name."})
 
   if(is.null(param)){
@@ -270,7 +288,7 @@ if(method == "AN81m" | method == "TERRACLIMATE"){
                                    Date = stringr::str_remove(.data$Date, "X"),
                                    Date = as.numeric(.data$Date))
 
-  } else if (class(data) == 'any_list'){
+  } else if (class(data) == 'any_list' | class(data)[[1]] == 'ee.imagecollection.ImageCollection'){
 
 
   proc <- proc %>% dplyr::mutate(raw_date = .data$Date,

@@ -15,7 +15,12 @@ band(
   fun = ee$Reducer$median(),
   variable = NULL,
   ggplot = FALSE,
-  save.plot = F
+  save.plot = F,
+  user_geom = NULL,
+  startDate = NULL,
+  endDate = NULL,
+  c.low = NULL,
+  c.high = NULL
 )
 }
 \arguments{
@@ -29,7 +34,7 @@ band(
 
 \item{temporal}{A \code{character} indicating what temporal filter to use on the collection, e.g. 'yearly' (default), 'monthly', 'year_month', 'all'.}
 
-\item{stat}{A \code{character} indicating what to reduce the imageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
+\item{stat}{A \code{character} indicating what to reduce the ImageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
 \item{lazy}{\code{logical} whether to run a 'sequential' future in the background or not.}
 
@@ -40,6 +45,16 @@ band(
 \item{ggplot}{\code{logical} TRUE/FALSE. Whether to print side-effect ggplot. See details.}
 
 \item{save.plot}{\code{logical} TRUE/FALSE. Whether to save the plot in a list, e.g. data + ggplot.}
+
+\item{user_geom}{\code{logical} TRUE/FALSE.}
+
+\item{startDate}{\code{character} format date, e.g. "2018-10-23". NULL (default)}
+
+\item{endDate}{\code{character} format date, e.g. "2018-10-23". NULL (default)}
+
+\item{c.low}{\code{numeric} lower month value for calendar range. NULL (default)}
+
+\item{c.high}{\code{numeric} higher month value for calendar range. NULL (default)}
 }
 \value{
 A \code{data.frame} and a side-effect plot (if ggplot = TRUE); unless using \code{save.plot} then a list with \code{data.frame} and ggplot.
@@ -49,8 +64,9 @@ This function allows the user to pass a previously created get_*() object to get
 a time series from a collection, e.g. banding/toBands. This uses the \link[rgee]{ee_extract} function from rgee.
 }
 \note{
-Goal is to add more capabilities to this function in the future by using map() server-side, e.g. monthly and annual filters. Faster with points or centroids of polygons.
-If lazy is TRUE, the function will be run in the background.
+Additional arguments to pass if using a ImageCollection without get_*()'s are the startDate, endDate, c.low and c.high arguments.
+Faster with points or centroids of polygons.
+If lazy is TRUE, the function will be run in the background using a for-loop.
 }
 \examples{
 \dontrun{

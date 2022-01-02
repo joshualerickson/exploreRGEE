@@ -1,0 +1,40 @@
+---
+title: "Using band"
+author: "Josh Erickson"
+date: "3/6/2021"
+vignette: >
+  %\VignetteIndexEntry{3. Using band}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+
+## Intro
+
+The `band()` function is a way to get time series from an imageCollection by using the Earth Engine function `toBands()` and {rgee} `ee_extract()`. It allows the user to reduce by time (temporal) and space (zonal stats `fun`). To use the `band()` we'll need to provide a imageCollection and from there we can get a time series. This is similar to `rr()` except we can now bring in the time component with the `temporal` argument. We'll go over a few examples below. Of note, this can be an expensive function depending on the size of query so take that into account when using and try using `lazy = TRUE` if expensive.   
+
+## Use get  
+
+First we'll need to get an image that we'll want to reduce on. We'll use the `get_landsat()` function, which will let us get an imageCollection. We'll need to define a `geometry` aka area of interest (aoi) so that we can clip the imageCollection. To do this we'll use the {mapedit}.  
+
+```{r, eval=F}
+library(mapedit)
+aoi <- drawFeatures()
+```
+
+From here we can start with the `get_landsat()` function and get an imageCollection. What's nice about using the `get_*()` functions is you will provide the time frame you are looking to analyze but if you don't use the `get*()` no worries! Just enter them into the arguments of the `band()` function.  
+
+```{r, eval=F}
+
+get_ld8 <- get_landsat(aoi = aoi,
+                     method = 'ld8',
+                     startDate = '2018-01-01',
+                     endDate = '2020-12-31',
+                     cloud_mask = TRUE,
+                     c.low = 6,
+                     c.high = 10)
+```
+
+
+
+

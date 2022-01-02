@@ -21,7 +21,7 @@ library(mapedit)
 aoi <- drawFeatures()
 ```
 
-From here we can start with the `get_landsat()` function and get an image. Let's use it with the {eemont} python package as well. The [{eemont}](https://github.com/davemlz/eemont) is a really nice comprehensive python package that integrates a myriad of current, intuitive and user friendly earth engine processes. 
+From here we can start with the `get_landsat()` function and get an image. Let's use it with the [{eemont}](https://github.com/davemlz/eemont) python package as well. The [{eemont}](https://github.com/davemlz/eemont) is a really nice comprehensive python package that integrates a myriad of current, intuitive and user friendly earth engine processes. 
 
 ```{r, eval = FALSE}
 library(exploreRGEE)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.R
 \name{get_linear}
 \alias{get_linear}
-\title{Get Image Difference}
+\title{Get Linear Regression}
 \usage{
 get_linear(
   data,
@@ -33,7 +33,7 @@ This function allows the user to get a linearFit() from an ImageCollection.
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

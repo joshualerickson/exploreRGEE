@@ -23,7 +23,7 @@
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -61,7 +61,7 @@ viz <- function(data, scale = 250, band = NULL, palette = "RdBu", n_pal = 6, rev
 
   } else {
 
-    image <- data$data
+    image <- data$image
     geom <- data$geom
     method <- data$method
     param <- data$param

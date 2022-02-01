@@ -45,7 +45,7 @@ downloaded areas for further analysis or passing on for some quick stats.
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

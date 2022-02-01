@@ -74,7 +74,7 @@ If lazy is TRUE, the function will be run in the background using a for-loop.
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

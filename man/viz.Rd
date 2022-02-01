@@ -61,7 +61,7 @@ depending on the scale. Since this is used for viewing, I would suggest to go bi
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

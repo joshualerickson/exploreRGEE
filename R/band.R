@@ -30,7 +30,7 @@
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -57,13 +57,20 @@ band <- function(data, geeFC = NULL, scale, band = NULL,
                  fun = ee$Reducer$median(), variable = NULL,
                  ggplot = FALSE, save.plot = F, user_geom = NULL, startDate = NULL,
                  endDate = NULL, c.low = NULL, c.high = NULL) {
-# error catching
+
+
+  # error catching
   if(missing(data)){stop("Need a get_* object or ImageCollection to use this function")}
-if(any(class(data) == 'diff_list' | class(data) == 'terrain_list' | class(data) == 'ee.image.Image')){stop("Can't band with this type of list")}
-if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correct temporal argument")}
+
+  if(any(class(data) == 'diff_list' | class(data) == 'terrain_list' | class(data) == 'ee.image.Image')){stop("Can't band with this type of list")}
+
+  if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correct temporal argument")}
+
   if(class(data)[[1]] == "ee.imagecollection.ImageCollection" & is.null(user_geom)){stop("Need a user geom if using ImageCollection")}
+
   # dissecting the passed get_*() object
-if(class(data)[[1]] == "ee.imagecollection.ImageCollection"){
+
+  if(class(data)[[1]] == "ee.imagecollection.ImageCollection"){
 
   aoi <- user_geom %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   imageCol <- data

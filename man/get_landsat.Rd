@@ -26,7 +26,7 @@ get_landsat(
 
 \item{param}{A \code{character} indicating what band to visualize, e.g. 'Blue' or c('Green', 'Red', 'NIR') or NULL returns all bands.}
 
-\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
+\item{stat}{A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.}
 
 \item{cloud_mask}{\code{logical} whether to mask out certain cloud artifacts. TRUE (default).}
 
@@ -78,7 +78,7 @@ Also, 'harm_ts' and 'ts' can take a long time to process in other function \link
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

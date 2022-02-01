@@ -78,39 +78,19 @@ geeFC_setup <- function(aoi, geeFC){
 
 # function for determining what reducer/stat to use
 
-data_stat <- function(data,stat){
+data_stat <- function(x,stat){
+  switch(stat,
 
-  if(stat == "median"){
-
-    data$median()
-
-  } else if (stat == "mean") {
-
-    data$mean()
-
-  } else if (stat == "max") {
-
-    data$max()
-
-  } else if (stat == "min") {
-
-    data$min()
-
-  } else if (stat == "sum"){
-
-    data$sum()
-
-  } else if (stat == "stdDev"){
-
-    data$reduce(ee$Reducer$stdDev())
-
-  } else if (stat == 'first'){
-
-    data$first()
-
+          "mean" = x$reduce(ee$Reducer$mean()),
+          "max" = x$reduce(ee$Reducer$max()),
+          "min" = x$reduce(ee$Reducer$min()),
+          "median"= x$reduce(ee$Reducer$median()),
+          "sum"= x$reduce(ee$Reducer$stdDev()),
+          "sd" =  x$reduce(ee$Reducer$stdDev()),
+          "first" = x$reduce(ee$Reducer$first()),
+          NULL
+  )
   }
-
-}
 
 
 

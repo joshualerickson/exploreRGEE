@@ -1,4 +1,5 @@
-#filter by year
+#' yearly filter
+#' perhaps can replcae year_filter
 
 year_filter2 <-  function(startDate, endDate, imageCol, stat){
 

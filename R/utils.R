@@ -133,4 +133,22 @@ class_type <- function(data, aoi, method, param, stat,
   }
 }
 
+convert_reducer <-  function(x){switch(x,
+                                       "mean" = function(x)x$reduce(ee$Reducer$mean()),
+                                       "max" = function(x)x$reduce(ee$Reducer$max()),
+                                       "min" = function(x)x$reduce(ee$Reducer$min()),
+                                       "median"= function(x)x$reduce(ee$Reducer$median()),
+                                       "sum"= function(x)x$reduce(ee$Reducer$sum()),
+                                       "sd" =  function(x)x$reduce(ee$Reducer$stdDev()),
+                                       "first" = x$reduce(ee$Reducer$first()),
+                                       NULL
+
+)
+}
+
+
+
+
+
+
 

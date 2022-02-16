@@ -71,7 +71,7 @@ year_filter <-  function(startDate, endDate, imageCol, stat){
   endYear = lubridate::year(endDate)
   years = ee$List$sequence(startYear, endYear)
 
-  ee_reducer <-  convert_reducer(stat)
+  ee_reducer <-  stat_to_reducer(stat)
 
   ee$ImageCollection$fromImages(
     years$map(rgee::ee_utils_pyfunc(function (y) {

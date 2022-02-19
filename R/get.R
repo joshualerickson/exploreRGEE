@@ -91,7 +91,7 @@ get_landsat <- function(aoi, method = "ld8", param = NULL, stat = "median", clou
                        aoi = aoi,
                        bbox = as.numeric(sf::st_bbox(aoi)))
 
-  class(landsat_list) = "landsat_list"
+  class(landsat_list) = c("landsat_list", "exploreList")
   return(landsat_list)
 
 }
@@ -198,7 +198,7 @@ get_met <- function(aoi, method = "Norm81m", param = NULL, stat = "median", star
                      m.low = m.low, m.high = m.high, bbox = as.numeric(sf::st_bbox(aoi)),
                    aoi = aoi)
 
-  class(met_list) = "met_list"
+  class(met_list) = c("met_list", "exploreList")
   return(met_list)
 }
 
@@ -271,7 +271,7 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
                      m.low = m.low, m.high = m.high,
                      bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(sent_list) = "sent2_list"
+  class(sent_list) = c("sent2_list", "exploreList")
   return(sent_list)
 }
 
@@ -354,7 +354,7 @@ get_npp <- function(aoi, method = "ld_NPP", param = NULL, stat = "median", cloud
                     m.low = m.low, m.high = m.high,
                     bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(npp_list) = "npp_list"
+  class(npp_list) = c("npp_list", "exploreList")
   return(npp_list)
 
 
@@ -437,7 +437,7 @@ image_col2 <- class_type(data,aoi = aoi,method = method, param = param, stat = s
                      startDate = startDate, endDate = endDate, startDate2 = startDate2, endDate2 = endDate2, c.low = c.low, c.high = c.high,
                      bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(diff_list) = "diff_list"
+  class(diff_list) = c("diff_list", "exploreList")
   return(diff_list)
 
 }
@@ -616,7 +616,7 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
                     startDate = NULL, endDate = NULL, c.low = NULL, c.high = NULL, mask = mask, m.low = m.low, m.high = m.high,
                     bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(terrain_list) = "terrain_list"
+  class(terrain_list) = c("terrain_list",, "exploreList")
   return(terrain_list)
 }
 
@@ -728,7 +728,7 @@ get_any <- function(aoi, image_type = "ImageCollection", method, param = NULL, s
                        aoi = aoi,
                        bbox = as.numeric(sf::st_bbox(aoi)))
 
-  class(any_list) = "any_list"
+  class(any_list) = c("any_list", "exploreList")
   return(any_list)
 
 }
@@ -847,7 +847,7 @@ get_nex <- function(aoi, method = 'ensemble', scenario = 'rcp85', model = 'ACCES
                    aoi = aoi,
                    bbox = as.numeric(sf::st_bbox(aoi)))
 
-  class(any_list) = "nex_list"
+  class(any_list) = c("nex_list", "exploreList")
   return(any_list)
 
 }
@@ -937,7 +937,7 @@ get_linear <- function(data, method = 'lfit', band = NULL, stat = 'median', temp
                     startDate = startDate, endDate = endDate,c.low = c.low, c.high = c.high,
                     bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(linear_list) = "linear_list"
+  class(linear_list) = c("linear_list", "exploreList")
   return(linear_list)
 
 }

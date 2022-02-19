@@ -30,7 +30,7 @@
 #' # Load Libraries
 #'
 #' library(rgee)
-#' ee_Initialize()
+#' rgee::ee_intialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -57,33 +57,26 @@ band <- function(data, geeFC = NULL, scale, band = NULL,
                  fun = ee$Reducer$median(), variable = NULL,
                  ggplot = FALSE, save.plot = F, user_geom = NULL, startDate = NULL,
                  endDate = NULL, c.low = NULL, c.high = NULL) {
-
-
   # error catching
   if(missing(data)){stop("Need a get_* object or ImageCollection to use this function")}
-
   if(any(class(data) == 'diff_list' | class(data) == 'terrain_list' | class(data) == 'ee.image.Image')){stop("Can't band with this type of list")}
-
   if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correct temporal argument")}
-
   if(class(data)[[1]] == "ee.imagecollection.ImageCollection" & is.null(user_geom)){stop("Need a user geom if using ImageCollection")}
-
   # dissecting the passed get_*() object
-
   if(class(data)[[1]] == "ee.imagecollection.ImageCollection"){
 
-  aoi <- user_geom %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
-  imageCol <- data
-  geom <- setup(aoi)
-  method <- NULL
-  param <- NULL
-  startDate <- startDate
-  endDate <- endDate
-  c.low <- c.low
-  c.high <- c.high
+    aoi <- user_geom %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
+    imageCol <- data
+    geom <- setup(aoi)
+    method <- NULL
+    param <- NULL
+    startDate <- startDate
+    endDate <- endDate
+    c.low <- c.low
+    c.high <- c.high
 
 
-} else {
+  } else {
     aoi <- data$aoi
     imageCol <- data$imageCol
     startDate <- data$startDate
@@ -94,7 +87,7 @@ band <- function(data, geeFC = NULL, scale, band = NULL,
     c.low <- data$c.low
     c.high <- data$c.high
 
-}
+  }
   if(is.null(param) & is.null(band))stop({"Need to choose a band name."})
 
   if(is.null(param)){
@@ -128,13 +121,13 @@ band <- function(data, geeFC = NULL, scale, band = NULL,
 
     if (isTRUE(lazy)){
 
-    reg <- geeFC_setup_aoi(aoi, geeFC)
+      reg <- geeFC_setup_aoi(aoi, geeFC)
 
     } else {
 
       reg <- geeFC_setup(aoi, geeFC)
 
-  }}
+    }}
 
   if(isTRUE(lazy)){
     prev_plan <- future::plan(future::sequential, .skip = TRUE)
@@ -150,8 +143,8 @@ band <- function(data, geeFC = NULL, scale, band = NULL,
 
 
     band_func(imageCol = imageCol, reg = reg, fun = fun, scale = scale, param = param,
-                  method = method, data = data, startDate = startDate, endDate = endDate, stat = stat,
-                  save.plot = save.plot, ggplot = ggplot, variable = variable, c.low = c.low, c.high = c.high, tmp_type = temporal)
+              method = method, data = data, startDate = startDate, endDate = endDate, stat = stat,
+              save.plot = save.plot, ggplot = ggplot, variable = variable, c.low = c.low, c.high = c.high, tmp_type = temporal)
 
   }
 
@@ -196,42 +189,18 @@ fut_band_func <- function(imageCol, data, reg, fun, scale, param, method, tmp_ty
 }
 
 band_func <- function(imageCol, reg, fun, scale, param, method, data,
-                       startDate, endDate, stat, save.plot, ggplot, variable, c.low, c.high, tmp_type){
+                      startDate, endDate, stat, save.plot, ggplot, variable, c.low, c.high, tmp_type){
 
-  # tB <- imageCol$toBands()
-  tB <-  imageCol |>
-    map_date_to_bandname_ic()
+  tB <- imageCol$toBands()
 
-  # cat("starting ee_extract\n")
   data_tb <- rgee::ee_extract(x = tB, y = reg$reg, fun = fun, scale = scale)
-  # client side
-  band_names_cli<- imageCol$first()$bandNames()$getInfo()
 
-  # regex to be removed from name to create date col
-  rm_rgx <- paste0(".*",band_names_cli)
-  rm_rgx <- glue::glue_collapse(rm_rgx,sep = "|")
+  param_name <- paste0("_",param)
 
-  # regex to extract parameter identifier
-  # reorder so shorter names with common prefix to another band names wont replace string before longer version
-  extract_rgx <- band_names_cli[stringr::str_order(band_names_cli,decreasing=T)]
-  extract_rgx <- glue::glue_collapse(extract_rgx,sep = "|")
-
-  proc <-  data_tb |>
-    # sf::st_drop_geometry() |>
-    tidyr::pivot_longer(contains(param),names_to = "measurment_id",values_to = param) |>
-    dplyr::mutate(
-      # parameter=stringr::str_extract(.data$name, pattern=extract_rgx),
-      Date= stringr::str_remove(string = .data$measurment_id, pattern = rm_rgx) |>
-        stringr::str_replace_all("_","-") |> lubridate::ymd()
-
-    ) |>
-    dplyr::select(-.data$measurment_id)
+  proc <- data_tb %>% tidyr::pivot_longer(dplyr::contains(param_name), names_to = "Date", values_to = param)
 
 
-  # proc <- data_tb %>% tidyr::pivot_longer(dplyr::contains(param_name), names_to = "Date", values_to = param)
-
-
-  # proc <- getting_proc(data = data, proc = proc, param_name = param_name, method = method, tmp_type = tmp_type)
+  proc <- getting_proc(data = data, proc = proc, param_name = param_name, method = method, tmp_type = tmp_type)
 
 
   if(ggplot == TRUE){
@@ -259,73 +228,73 @@ getting_proc <- function(data, proc, param_name, method, tmp_type){
 
   if(tmp_type == 'all'){
 
-  if(class(data) == 'met_list'){
+    if(class(data) == 'met_list'){
 
-if(method == "AN81m" | method == "TERRACLIMATE"){
+      if(method == "AN81m" | method == "TERRACLIMATE"){
 
-  proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, "X"),
-                                 Date = stringr::str_remove_all(.data$Date, param_name),
-                                 Date = stringr::str_replace(.data$Date,"(\\d{4})", "\\1-"),
-                                 Date = paste0(.data$Date, "-01"),
-                                 Date = lubridate::as_date(.data$Date))
+        proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, "X"),
+                                       Date = stringr::str_remove_all(.data$Date, param_name),
+                                       Date = stringr::str_replace(.data$Date,"(\\d{4})", "\\1-"),
+                                       Date = paste0(.data$Date, "-01"),
+                                       Date = lubridate::as_date(.data$Date))
 
-} else if (method == "AN81d" | method == 'GRIDMET' | method == 'DAYMET') {
+      } else if (method == "AN81d" | method == 'GRIDMET' | method == 'DAYMET') {
 
-  proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, "X"),
-                                 Date = stringr::str_remove_all(.data$Date,param_name),
-                                 Date = stringr::str_replace(.data$Date,"(\\d{4})", "\\1-"),
-                                 Date = lubridate::as_date(.data$Date))
+        proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, "X"),
+                                       Date = stringr::str_remove_all(.data$Date,param_name),
+                                       Date = stringr::str_replace(.data$Date,"(\\d{4})", "\\1-"),
+                                       Date = lubridate::as_date(.data$Date))
 
-} else if (method == 'TRMMh'){
+      } else if (method == 'TRMMh'){
 
-  proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, 'X'),
-              Date = stringr::str_remove_all(.data$Date, param_name),
-              Date = stringr::str_sub(.data$Date, start = 6),
-              Date = stringr::str_sub(.data$Date, end = -3),
-              Date = stringr::str_replace_all(.data$Date, "_", " "),
-              Date = stringr::str_replace(.data$Date, "(\\d{6})", "\\1-"),
-              Date = stringr::str_replace(.data$Date, "(\\d{4})", "\\1-"),
-              Date = paste0(.data$Date, "00"),
-              Date = lubridate::parse_date_time2(.data$Date, orders = '%Y/%m/%d %H:%M'))
+        proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, 'X'),
+                                       Date = stringr::str_remove_all(.data$Date, param_name),
+                                       Date = stringr::str_sub(.data$Date, start = 6),
+                                       Date = stringr::str_sub(.data$Date, end = -3),
+                                       Date = stringr::str_replace_all(.data$Date, "_", " "),
+                                       Date = stringr::str_replace(.data$Date, "(\\d{6})", "\\1-"),
+                                       Date = stringr::str_replace(.data$Date, "(\\d{4})", "\\1-"),
+                                       Date = paste0(.data$Date, "00"),
+                                       Date = lubridate::parse_date_time2(.data$Date, orders = '%Y/%m/%d %H:%M'))
 
-} else if (method == 'TRMMm'){
+      } else if (method == 'TRMMm'){
 
-  proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, 'X'),
-                                 Date = stringr::str_remove_all(.data$Date, param_name),
-                                 Date = stringr::str_sub(.data$Date, start = 6),
-                                 Date = stringr::str_sub(.data$Date, end = -3),
-                                 Date = lubridate::as_date(.data$Date)
-                                 )
+        proc <- proc %>% dplyr::mutate(Date = stringr::str_remove_all(.data$Date, 'X'),
+                                       Date = stringr::str_remove_all(.data$Date, param_name),
+                                       Date = stringr::str_sub(.data$Date, start = 6),
+                                       Date = stringr::str_sub(.data$Date, end = -3),
+                                       Date = lubridate::as_date(.data$Date)
+        )
 
-}
-  } else if (class(data) == 'landsat_list'){
-
-
-    proc <- proc %>% dplyr::mutate(Date = stringr::str_remove(.data$Date, param_name),
-                                   Date = stringr::str_sub(.data$Date, start = -8),
-                                   Date = lubridate::as_date(.data$Date))
-
-  } else if (class(data) == 'sent2_list'){
+      }
+    } else if (class(data) == 'landsat_list'){
 
 
-    proc <- proc %>% dplyr::mutate(Date = stringr::str_sub(.data$Date, end = 9),
-                                   Date = stringr::str_remove(.data$Date, "X"),
-                                   Date = lubridate::as_date(.data$Date))
+      proc <- proc %>% dplyr::mutate(Date = stringr::str_remove(.data$Date, param_name),
+                                     Date = stringr::str_sub(.data$Date, start = -8),
+                                     Date = lubridate::as_date(.data$Date))
 
-  } else if (class(data) == 'npp_list'){
-
-
-    proc <- proc %>% dplyr::mutate(Date = stringr::str_remove(.data$Date, "_annualNPP"),
-                                   Date = stringr::str_remove(.data$Date, "X"),
-                                   Date = as.numeric(.data$Date))
-
-  } else if (class(data) == 'any_list' | class(data)[[1]] == 'ee.imagecollection.ImageCollection'){
+    } else if (class(data) == 'sent2_list'){
 
 
-  proc <- proc %>% dplyr::mutate(raw_date = .data$Date,
-                                 Date = dplyr::row_number())
+      proc <- proc %>% dplyr::mutate(Date = stringr::str_sub(.data$Date, end = 9),
+                                     Date = stringr::str_remove(.data$Date, "X"),
+                                     Date = lubridate::as_date(.data$Date))
 
-  }
+    } else if (class(data) == 'npp_list'){
+
+
+      proc <- proc %>% dplyr::mutate(Date = stringr::str_remove(.data$Date, "_annualNPP"),
+                                     Date = stringr::str_remove(.data$Date, "X"),
+                                     Date = as.numeric(.data$Date))
+
+    } else if (class(data) == 'any_list' | class(data)[[1]] == 'ee.imagecollection.ImageCollection'){
+
+
+      proc <- proc %>% dplyr::mutate(raw_date = .data$Date,
+                                     Date = dplyr::row_number())
+
+    }
 
   } else if (tmp_type == 'year_month'){
 

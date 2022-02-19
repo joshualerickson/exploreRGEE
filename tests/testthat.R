@@ -1,0 +1,5 @@
+library(testthat)
+library(exploreRGEE)
+library(rgee)
+ee_Initialize()
+test_check("exploreRGEE")

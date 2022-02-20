@@ -1,13 +1,12 @@
 #' @title Filter by Month
 #' @param imageCol An earth engine ImageCollection
-#' @param stat A \code{character} indicating what to reduce the imageCollection by,
-#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
+#' @param ... extra args to pass on
 #' @export
 #'
 #'
 
 
-ee_month_filter <- function(imageCol, stat,...){
+ee_month_filter <- function(imageCol, ...){
 
   UseMethod('ee_month_filter')
 
@@ -17,10 +16,12 @@ ee_month_filter <- function(imageCol, stat,...){
 
 
 #' @name ee_month_filter
+#' @param stat A \code{character} indicating what to reduce the imageCollection by,
+#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
 #' @param months \code{numeric} vector, e.g. c(1,12).
 #' @export
 
-ee_month_filter.ee.imagecollection.ImageCollection <- function(imageCol,months, stat){
+ee_month_filter.ee.imagecollection.ImageCollection <- function(imageCol, stat, months, ...){
 
 months = ee$List$sequence(months[1], months[2])
 
@@ -45,8 +46,10 @@ ee$ImageCollection$fromImages(
 }
 
 #' @name ee_month_filter
+#' @param stat A \code{character} indicating what to reduce the imageCollection by,
+#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
 #' @export
-ee_month_filter.exploreList <- function(imageCol, stat){
+ee_month_filter.exploreList <- function(imageCol, stat, ...){
 
   months = ee$List$sequence(imageCol$c.low, imageCol$c.high)
 
@@ -75,33 +78,32 @@ ee_month_filter.exploreList <- function(imageCol, stat){
 
 #' @title Filter by Year
 #' @param imageCol An earth engine ImageCollection
-#' @param startDate \code{character} format date, e.g. "2018-10-23".
-#' @param endDate \code{character} format date, e.g. "2018-10-23".
-#' @param stat A \code{character} indicating what to reduce the imageCollection by,
-#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
+#' @param ... extra args to pass on
 #'
 #' @export
 #'
 
 
-ee_year_filter <- function(imageCol, stat,...){
+ee_year_filter <- function(imageCol,...){
 
   UseMethod('ee_year_filter')
 
 }
 
 #' @name ee_year_filter
-#' @param startDate
-#' @param endDate
+#' @param stat A \code{character} indicating what to reduce the imageCollection by,
+#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
+#' @param startDate \code{character} format date, e.g. "2018-10-23".
+#' @param endDate \code{character} format date, e.g. "2018-10-23".
 #' @export
 #'
 #'
 
 ee_year_filter.ee.imagecollection.ImageCollection <-  function(imageCol,
+                                                            stat,
                                                             startDate,
                                                             endDate,
-                                                            stat
-                                                            ){
+                                                            ...){
 
   stopifnot(!is.null(imageCol), inherits(imageCol, "ee.imagecollection.ImageCollection"))
 
@@ -129,12 +131,15 @@ ee_year_filter.ee.imagecollection.ImageCollection <-  function(imageCol,
 }
 
 #' @name ee_year_filter
+#' @param stat A \code{character} indicating what to reduce the imageCollection by,
+#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
 #' @export
 #'
 #'
 
 ee_year_filter.exploreList <-  function(imageCol,
-                                     stat
+                                        stat,
+                                        ...
                                      ) {
 
 
@@ -166,36 +171,35 @@ ee_year_filter.exploreList <-  function(imageCol,
 
 #' @title Filter by Year and Month
 #' @param imageCol An earth engine ImageCollection
-#' @param startDate \code{character} format date, e.g. "2018-10-23".
-#' @param endDate \code{character} format date, e.g. "2018-10-23".
-#' @param months \code{numeric} vector, e.g. c(1,12).
-#' @param stat A \code{character} indicating what to reduce the imageCollection by,
-#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
+#' @param ... extra args to pass on
 #'
 #' @export
 #'
 #'
 
 
-ee_year_month_filter <- function(imageCol, stat,...){
+ee_year_month_filter <- function(imageCol, ...){
 
   UseMethod('ee_year_month_filter')
 
 }
 
 #' @name ee_year_month_filter
-#' @param startDate
-#' @param endDate
-#' @param months
+#' @param stat A \code{character} indicating what to reduce the imageCollection by,
+#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
+#' @param startDate \code{character} format date, e.g. "2018-10-23".
+#' @param endDate \code{character} format date, e.g. "2018-10-23".
+#' @param months \code{numeric} vector, e.g. c(1,12).
 #' @export
 #'
 #'
 
 ee_year_month_filter.ee.imagecollection.ImageCollection <-  function(imageCol,
+                                                               stat,
                                                                startDate,
                                                                endDate,
                                                                months,
-                                                               stat
+                                                               ...
 ){
 
   stopifnot(!is.null(imageCol), inherits(imageCol, "ee.imagecollection.ImageCollection"))
@@ -237,12 +241,15 @@ ee$ImageCollection(ee$FeatureCollection(years$map(rgee::ee_utils_pyfunc(function
 }
 
 #' @name ee_year_month_filter
+#' @param stat A \code{character} indicating what to reduce the imageCollection by,
+#'  e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
 #' @export
 #'
 #'
 
 ee_year_month_filter.exploreList <-  function(imageCol,
-                                        stat
+                                              stat,
+                                              ...
 ){
 
 

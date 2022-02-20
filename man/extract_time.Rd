@@ -6,6 +6,17 @@
 \usage{
 extract_time(imageCol, reg, reducer, scale, ...)
 }
+\arguments{
+\item{imageCol}{ee ImageCollection}
+
+\item{reg}{sf object}
+
+\item{reducer}{what reducer to use in rgee::ee_extract}
+
+\item{scale}{scale in meters}
+
+\item{...}{extra args to pass to rgee::ee_extract}
+}
 \description{
 Function used to get extraction of filtered IC and then returns a nice tidy
 data.frame with time = date and .names as the band name, e.g. B1_mean, B1_median, etc.

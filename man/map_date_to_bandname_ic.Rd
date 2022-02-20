@@ -2,13 +2,14 @@
 % Please edit documentation in R/timeseries.R
 \name{map_date_to_bandname_ic}
 \alias{map_date_to_bandname_ic}
-\title{}
+\title{map_date_to_bandname_ic}
 \usage{
 map_date_to_bandname_ic(ic)
 }
 \arguments{
-\item{ic}{}
+\item{ic}{ee ImageCollection}
 }
 \description{
-Slick helper function by Zack that get's the names of the bands and attaches date.
+Slick helper function by Zack that get's the names
+of the bands as well as the date.
 }

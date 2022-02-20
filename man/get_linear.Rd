@@ -4,13 +4,7 @@
 \alias{get_linear}
 \title{Get Linear Regression}
 \usage{
-get_linear(
-  data,
-  method = "lfit",
-  band = NULL,
-  stat = "median",
-  temporal = "yearly"
-)
+get_linear(data, band = NULL, stat = "median", temporal = "yearly")
 }
 \arguments{
 \item{data}{A previously create get_* object.}

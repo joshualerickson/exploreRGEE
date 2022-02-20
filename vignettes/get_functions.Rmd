@@ -16,28 +16,7 @@ library(exploreRGEE)
 ```
 ## Intro
 
-We'll go through as much as we can with the `get_*()`'s in exploreRGEE. Also, we'll look at the `aoi_draw()` function and how that's incorporated into the workflow. The main purpose of the get_()'s is to handle as much preprocessing as possible. One of the most frustrating things about getting an Image or ImageCollection outside earth engine (online) is remembering or having to navigate to get the ID, e.g. "LANDSAT/LC08/C01/T1_SR". The functions below will hopefully lessen that frustration so the user can easily get started in a workflow. Other reasons to use include filtering by bounds (location), date, month and mask, which are standard arguments in common workflows. 
-
-## Using aoi_draw
-
-`aoi_draw()` helps with getting a quick area of interest, polygons or points. This means less time figuring out bounding boxes and more time for analysis! Below is a quick example using the function from which we'll use in the `get_()`'s. 
-
-Just call `aoi_draw()` and a shiny app will open. From there just use the left pane to either get points, polygons or rectangles. You can also edit the table as well by editing the 'ID' column in the app by clicking 'Edit Table'. In addition, 'Clear Map' will clear the choices you've already made, i.e. clean slate.
-
-```{r, eval=F}
-library(rgee)
-ee_Initialize()
-
-library(exploreRGEE)
-
-aoi_draw()
-```
-```{r, echo=FALSE, fig.align='center', out.width='50%'}
-knitr::include_graphics("get_fig1.png")
-```
-<br>
-
-When your done, just either use 'Finish Locations' or exit out of the app. A sf object will be saved as `aoi` in your current environment. From there, you can use it in the rest of your analysis. 
+We'll go through as much as we can with the `get_*()`'s in exploreRGEE. The main purpose of the get_()'s is to handle as much preprocessing as possible. One of the most frustrating things about getting an Image or ImageCollection outside earth engine (online) is remembering or having to navigate to get the ID, e.g. "LANDSAT/LC08/C01/T1_SR". The functions below will hopefully lessen that frustration so the user can easily get started in a workflow. Other reasons to use include filtering by bounds (location), date, month and mask, which are standard arguments in common workflows. 
 
 ## Using get
 

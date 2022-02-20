@@ -6,14 +6,16 @@
 \alias{ee_month_filter.exploreList}
 \title{Filter by Month}
 \usage{
-ee_month_filter(imageCol, stat, ...)
+ee_month_filter(imageCol, ...)
 
-\method{ee_month_filter}{ee.imagecollection.ImageCollection}(imageCol, months, stat)
+\method{ee_month_filter}{ee.imagecollection.ImageCollection}(imageCol, stat, months, ...)
 
-\method{ee_month_filter}{exploreList}(imageCol, stat)
+\method{ee_month_filter}{exploreList}(imageCol, stat, ...)
 }
 \arguments{
 \item{imageCol}{An earth engine ImageCollection}
+
+\item{...}{extra args to pass on}
 
 \item{stat}{A \code{character} indicating what to reduce the imageCollection by,
 e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.}

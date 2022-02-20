@@ -96,23 +96,40 @@ band <- function(data, geeFC = NULL, scale, band = NULL,
     param <- band
 
   }
-
+  if(class(data)[[1]] == "ee.imagecollection.ImageCollection"){
   if(temporal == 'yearly'){
 
-    imageCol <- year_filter(startDate = startDate, endDate = endDate,imageCol = imageCol, stat = stat)
+    imageCol <- ee_year_filter(startDate = startDate, endDate = endDate,imageCol = imageCol, stat = stat)
 
   } else if (temporal == 'monthly'){
 
-    imageCol <- month_filter(c.low = c.low, c.high = c.high,imageCol = imageCol, stat = stat)
+    imageCol <- ee_month_filter(c.low = c.low, c.high = c.high,imageCol = imageCol, stat = stat)
 
   } else if (temporal == 'year_month') {
 
-    imageCol <- year_month_filter(startDate = startDate, endDate = endDate,c.low = c.low, c.high = c.high,imageCol = imageCol, stat = stat)
+    imageCol <- ee_year_month_filter(startDate = startDate, endDate = endDate,c.low = c.low, c.high = c.high,imageCol = imageCol, stat = stat)
 
   } else if (temporal == 'all'){
 
   }
+  } else {
 
+    if(temporal == 'yearly'){
+
+      imageCol <- ee_year_filter(imageCol = imageCol, stat = stat)
+
+    } else if (temporal == 'monthly'){
+
+      imageCol <- ee_month_filter(imageCol = imageCol, stat = stat)
+
+    } else if (temporal == 'year_month') {
+
+      imageCol <- ee_year_month_filter(imageCol = imageCol, stat = stat)
+
+    } else if (temporal == 'all'){
+
+    }
+}
   if(is.null(geeFC)) {
 
     reg <- sf_setup(aoi)

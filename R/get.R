@@ -616,7 +616,7 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
                     startDate = NULL, endDate = NULL, c.low = NULL, c.high = NULL, mask = mask, m.low = m.low, m.high = m.high,
                     bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(terrain_list) = c("terrain_list",, "exploreList")
+  class(terrain_list) = c("terrain_list", "exploreList")
   return(terrain_list)
 }
 
@@ -883,7 +883,7 @@ get_nex <- function(aoi, method = 'ensemble', scenario = 'rcp85', model = 'ACCES
 #' lr %>% viz(band = 'scale')
 #' }
 
-get_linear <- function(data, method = 'lfit', band = NULL, stat = 'median', temporal = 'yearly'){
+get_linear <- function(data, band = NULL, stat = 'median', temporal = 'yearly'){
 
   if(missing(data))stop({"Need a previously created get_* object as 'data'."})
 
@@ -913,15 +913,12 @@ get_linear <- function(data, method = 'lfit', band = NULL, stat = 'median', temp
 
   if (temporal == 'yearly'){
 
-      collection <- year_filter(startDate = startDate, endDate = endDate,
-                            imageCol = collection, stat = stat)
+      collection <- ee_year_filter(imageCol = collection, stat = stat)
       ind_dep <- c('system:time_start', param)
 
   } else if (temporal == 'year_month'){
 
-    collection <- year_month_filter(startDate = startDate, endDate = endDate,
-                                    imageCol = collection, stat = stat, c.low = c.low,
-                                    c.high = c.high)
+    collection <- ee_year_month_filter(imageCol = collection, stat = stat)
     ind_dep <- c(paste0('system:time_start_',stat), paste0(param, '_',stat))
 
   } else {
@@ -933,7 +930,7 @@ get_linear <- function(data, method = 'lfit', band = NULL, stat = 'median', temp
 
   trend <- collection$select(ind_dep)$reduce(ee$Reducer$linearFit())
 
-  linear_list <- list(imageCol = collection, image = trend, geom = geom, method = method, param = NULL, stat = stat,
+  linear_list <- list(imageCol = collection, image = trend, geom = geom, method = 'lfit', param = NULL, stat = stat,
                     startDate = startDate, endDate = endDate,c.low = c.low, c.high = c.high,
                     bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 

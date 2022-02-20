@@ -31,9 +31,6 @@ Development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("joshualerickson/exploreRGEE")
 
-# recommended
-# https://github.com/mikejohnson51/AOI/tree/master/R
-remotes::install_github("mikejohnson51/AOI")
 ```
 
 ## Important Note
@@ -86,8 +83,7 @@ Let's look at Northwestern Montana and the median NPP over a 30 year span (1986 
 
 ```{r, eval=T}
 
-lincoln_county <- AOI::aoi_get(state = "Montana", county = "Lincoln")
-
+lincoln_county <- AOI::aoi_get(state = 'Montana', county = 'Lincoln')
 npp <- get_npp(lincoln_county, method = 'ld_NPP', param = 'annualNPP', stat = 'median', startDate = '1986-01-01', endDate = '2016-01-01')
 ```
 <br>

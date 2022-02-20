@@ -6,16 +6,7 @@
 \alias{ee_timeseries.exploreList}
 \title{Extract Time Series}
 \usage{
-ee_timeseries(
-  imageCol,
-  geeFC = NULL,
-  scale,
-  temporal = "yearly",
-  temporal_stat = "mean",
-  reducer = "mean",
-  lazy = FALSE,
-  ...
-)
+ee_timeseries(imageCol, ...)
 
 \method{ee_timeseries}{ee.imagecollection.ImageCollection}(
   imageCol,
@@ -26,9 +17,9 @@ ee_timeseries(
   temporal_stat = "mean",
   reducer = "mean",
   lazy = FALSE,
-  startDate,
-  endDate,
-  months,
+  startDate = NULL,
+  endDate = NULL,
+  months = NULL,
   ...
 )
 
@@ -46,6 +37,10 @@ ee_timeseries(
 \arguments{
 \item{imageCol}{A previously created get_* object or ee ImageCollection}
 
+\item{...}{extra args to pass on}
+
+\item{geom}{A sf data.frame object.}
+
 \item{geeFC}{A known GEE FeatureCollection or asset, e.g. "USGS/WBD/2017/HUC12"}
 
 \item{scale}{\code{numeric} value indicating what to reduce the regions by, e.g. 800 (m) default.}
@@ -58,7 +53,11 @@ ee_timeseries(
 
 \item{lazy}{\code{logical} whether to run a 'sequential' future in the background or not.}
 
-\item{...}{Other arguments to pass to \link[rgee]{ee_extract} function.}
+\item{startDate}{\code{character} format date, e.g. "2018-10-23".}
+
+\item{endDate}{\code{character} format date, e.g. "2018-10-23".}
+
+\item{months}{\code{numeric} vector of monnths, e.g. c(1,12).}
 }
 \description{
 This function allows the user to pass a previously created get_*() object or ee ImageCollection to get

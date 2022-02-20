@@ -33,25 +33,18 @@
 #'
 #' }
 
-ee_timeseries <- function(imageCol,
-                          geeFC = NULL,
-                          scale,
-                          temporal = 'yearly',
-                          temporal_stat = 'mean',
-                          reducer = 'mean',
-                          lazy = FALSE,
-                          ...) {
+ee_timeseries <- function(imageCol, ...) {
 
   UseMethod('ee_timeseries')
 }
 
 
 #' @name ee_timeseries
-#' @param geom
-#' @param startDate
-#' @param endDate
-#' @param months
-#' @param ...
+#' @param geom A sf data.frame object.
+#' @param startDate \code{character} format date, e.g. "2018-10-23".
+#' @param endDate \code{character} format date, e.g. "2018-10-23".
+#' @param months \code{numeric} vector of monnths, e.g. c(1,12).
+#' @param ... extra args to pass on
 #' @export
 
 ee_timeseries.ee.imagecollection.ImageCollection <- function(imageCol,
@@ -62,9 +55,9 @@ ee_timeseries.ee.imagecollection.ImageCollection <- function(imageCol,
                                                              temporal_stat = 'mean',
                                                              reducer = 'mean',
                                                              lazy = FALSE,
-                                                             startDate,
-                                                             endDate,
-                                                             months,
+                                                             startDate = NULL,
+                                                             endDate = NULL,
+                                                             months = NULL,
                                                              ...){
 
   # error catching
@@ -92,7 +85,6 @@ ee_timeseries.ee.imagecollection.ImageCollection <- function(imageCol,
   } else if (temporal == 'all'){
 
   }
-
 
   if(is.null(geeFC)) {
 
@@ -139,7 +131,7 @@ ee_timeseries.ee.imagecollection.ImageCollection <- function(imageCol,
 
 
 #' @name ee_timeseries
-#' @param ...
+#' @param ... extra args to pass on
 #' @export
 ee_timeseries.exploreList <- function(imageCol,
                                       geeFC = NULL,
@@ -166,23 +158,7 @@ ee_timeseries.exploreList <- function(imageCol,
 
   stopifnot(!is.null(imageCol), inherits(imageCol, "exploreList"))
 
-  #use filter functions
-  if(temporal == 'yearly'){
-
-    imageCol <- ee_year_filter(imageCol = imageCol, stat = temporal_stat)
-
-  } else if (temporal == 'monthly'){
-
-    imageCol <- ee_month_filter(imageCol = imageCol, stat = temporal_stat)
-
-  } else if (temporal == 'year_month') {
-
-    imageCol <- ee_year_month_filter(imageCol = imageCol, stat = temporal_stat)
-
-  } else if (temporal == 'all'){
-
-    imageCol <- imageCol$imageCol
-  }
+  imageCol <- temporal_filter(temporal, imageCol, temporal_stat)
 
 
   if(is.null(geeFC)) {
@@ -230,11 +206,11 @@ ee_timeseries.exploreList <- function(imageCol,
 #' @title extract_time
 #' @description Function used to get extraction of filtered IC and then returns a nice tidy
 #' data.frame with time = date and .names as the band name, e.g. B1_mean, B1_median, etc.
-#' @param imageCol
-#' @param reg
-#' @param reducer
-#' @param scale
-#' @param ...
+#' @param imageCol ee ImageCollection
+#' @param reg sf object
+#' @param reducer what reducer to use in rgee::ee_extract
+#' @param scale scale in meters
+#' @param ... extra args to pass to rgee::ee_extract
 extract_time <- function(imageCol, reg, reducer, scale,...){
 
   reducer_fun <- switch(
@@ -283,9 +259,10 @@ extract_time <- function(imageCol, reg, reducer, scale,...){
     select(-.data$.names)
 }
 
-#' @title
-#' @description Slick helper function by Zack that get's the names of the bands and attaches date.
-#' @param ic
+#' @title map_date_to_bandname_ic
+#' @description Slick helper function by Zack that get's the names
+#' of the bands as well as the date.
+#' @param ic ee ImageCollection
 #'
 map_date_to_bandname_ic <- function(ic){
   ic |>
@@ -309,3 +286,25 @@ map_date_to_bandname_ic <- function(ic){
     )
 
 }
+
+
+#' @title Filtering by Temporal Arguments
+#' @description A helper function to distinguish time reducer
+#' @param temporal time to reduce
+#' @param imageCol ee ImageCollection
+#' @param temporal_stat what to reduce time by.
+#'
+temporal_filter <- function(temporal, imageCol, temporal_stat){
+
+
+    switch(temporal,
+           'yearly' = ee_year_filter(imageCol, temporal_stat),
+           'monthly' = ee_month_filter(imageCol, temporal_stat),
+           'year_month' = ee_year_month_filter(imageCol, temporal_stat),
+           'all' = imageCol$imageCol,
+           NULL
+    )
+}
+
+
+

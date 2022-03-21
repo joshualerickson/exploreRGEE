@@ -26,6 +26,29 @@ reducers <-  function() {
 )
 }
 
+reducers_min_max <- function(image, geom, scale) {
+
+  reducers <- rgee::ee$Reducer$min()$combine(
+  reducer2 = rgee::ee$Reducer$max(),
+  sharedInputs = TRUE)
+
+if(is.null(geom)){
+
+c(0,1)
+
+} else {
+
+stats <- image$reduceRegions(
+  reducer = reducers,
+  collection = geom,
+  scale = scale)
+
+min <- stats$getInfo()$features[[1]]$properties$min
+max <- stats$getInfo()$features[[1]]$properties$max
+
+c(min,max)
+}
+}
 
 
 

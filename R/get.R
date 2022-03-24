@@ -7,7 +7,7 @@
 #' @param aoi A sf object indicating the extent of the geom.
 #' @param method A \code{character} indicating what method to use, e.g. 'ld8', 'ld7', 'ld5', 'ld4', 'ts', 'harm_ts'.
 #' @param param A \code{character} indicating what band to visualize, e.g. 'Blue' or c('Green', 'Red', 'NIR') or NULL returns all bands.
-#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
+#' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'sd', 'first'.
 #' @param cloud_mask \code{logical} whether to mask out certain cloud artifacts. TRUE (default).
 #' @param startDate \code{character} format date, e.g. "1999-10-23"
 #' @param endDate \code{character} format date, e.g. "1999-10-23"
@@ -40,7 +40,7 @@
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -85,13 +85,13 @@ get_landsat <- function(aoi, method = "ld8", param = NULL, stat = "median", clou
 
   }
 
-  landsat_list <- list(imageCol = col, data = data, geom = geom, method = method, param = param, stat = stat,
+  landsat_list <- list(imageCol = col, image = data, geom = geom, method = method, param = param, stat = stat,
                        startDate = startDate, endDate = endDate, c.low = c.low, c.high = c.high, mask = mask,
                        m.low = m.low, m.high = m.high,
                        aoi = aoi,
                        bbox = as.numeric(sf::st_bbox(aoi)))
 
-  class(landsat_list) = "landsat_list"
+  class(landsat_list) = c("landsat_list", "exploreList")
   return(landsat_list)
 
 }
@@ -134,7 +134,7 @@ get_landsat <- function(aoi, method = "ld8", param = NULL, stat = "median", clou
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -193,12 +193,12 @@ get_met <- function(aoi, method = "Norm81m", param = NULL, stat = "median", star
   }
 
 
-  met_list <- list(imageCol = met, data = data, geom = geom, method = method, param = param, stat = stat,
+  met_list <- list(imageCol = met, image = data, geom = geom, method = method, param = param, stat = stat,
                      startDate = startDate, endDate = endDate, c.low = c.low, c.high = c.high, mask = mask,
                      m.low = m.low, m.high = m.high, bbox = as.numeric(sf::st_bbox(aoi)),
                    aoi = aoi)
 
-  class(met_list) = "met_list"
+  class(met_list) = c("met_list", "exploreList")
   return(met_list)
 }
 
@@ -225,7 +225,7 @@ get_met <- function(aoi, method = "Norm81m", param = NULL, stat = "median", star
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -266,12 +266,12 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
 
   }
 
-  sent_list <- list(imageCol = s2, data = data, geom = geom, method = method, param = param, stat = stat,
+  sent_list <- list(imageCol = s2, image = data, geom = geom, method = method, param = param, stat = stat,
                      startDate = startDate, endDate = endDate, c.low = c.low, c.high = c.high, mask = mask,
                      m.low = m.low, m.high = m.high,
                      bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(sent_list) = "sent2_list"
+  class(sent_list) = c("sent2_list", "exploreList")
   return(sent_list)
 }
 
@@ -305,7 +305,7 @@ get_sent2 <- function (aoi, method = "S2_1C", param = NULL, stat = "median", clo
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -349,12 +349,12 @@ get_npp <- function(aoi, method = "ld_NPP", param = NULL, stat = "median", cloud
 
   }
 
-  npp_list <- list(imageCol = col_med, data = data, geom = geom, method = method, param = param, stat = stat,
+  npp_list <- list(imageCol = col_med, image = data, geom = geom, method = method, param = param, stat = stat,
                     startDate = startDate, endDate = endDate, c.low = c.low, c.high = c.high, mask = mask,
                     m.low = m.low, m.high = m.high,
                     bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(npp_list) = "npp_list"
+  class(npp_list) = c("npp_list", "exploreList")
   return(npp_list)
 
 
@@ -375,7 +375,7 @@ get_npp <- function(aoi, method = "ld_NPP", param = NULL, stat = "median", cloud
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -433,11 +433,11 @@ image_col2 <- class_type(data,aoi = aoi,method = method, param = param, stat = s
 
   final_image <- image2$subtract(image)
 
-  diff_list <- list(imageCol = list(imageCol, image_col2$imageCol), data = final_image, geom = geom, method = method, param = param, stat = stat,
+  diff_list <- list(imageCol = list(imageCol, image_col2$imageCol), image = final_image, geom = geom, method = method, param = param, stat = stat,
                      startDate = startDate, endDate = endDate, startDate2 = startDate2, endDate2 = endDate2, c.low = c.low, c.high = c.high,
                      bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(diff_list) = "diff_list"
+  class(diff_list) = c("diff_list", "exploreList")
   return(diff_list)
 
 }
@@ -459,7 +459,7 @@ image_col2 <- class_type(data,aoi = aoi,method = method, param = param, stat = s
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -612,11 +612,11 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 
   }
 
-  terrain_list <- list(imageCol = NULL, data = data, geom = geom, method = method, param = param, stat = NULL,
+  terrain_list <- list(imageCol = NULL, image = data, geom = geom, method = method, param = param, stat = NULL,
                     startDate = NULL, endDate = NULL, c.low = NULL, c.high = NULL, mask = mask, m.low = m.low, m.high = m.high,
                     bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(terrain_list) = "terrain_list"
+  class(terrain_list) = c("terrain_list", "exploreList")
   return(terrain_list)
 }
 
@@ -624,7 +624,7 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 #' Get Earth Engine Products
 #' @description This function allows the user to provide a earth engine image/imageCollection \code{character} string which will help with simple processing.
 #' @param aoi A sf object indicating the extent of the geom.
-#' @param i_type A \code{character} indicating what type of image, e.g. 'ImageCollection' or 'Image'.
+#' @param image_type A \code{character} indicating what type of image, e.g. 'ImageCollection' or 'Image'.
 #' @param method A \code{character} indicating what imageCollection to use, e.g. "UMD/hansen/global_forest_change_2019_v1_7".
 #' @param param A \code{character} indicating what band to select.
 #' @param stat A \code{character} indicating what to reduce the imageCollection by, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.
@@ -644,7 +644,7 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -652,12 +652,12 @@ get_terrain <- function(aoi, method = "NED", param = "slope",
 #'
 #' # get any Image or ImageCollection
 #'
-#' forest_cover_loss <- get_any(huc, i_type = "Image",
+#' forest_cover_loss <- get_any(huc, image_type = "Image",
 #'                              method = 'UMD/hansen/global_forest_change_2019_v1_7',
 #'                              param = 'lossyear')
 #' }
 #'
-get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat = "median", startDate = NULL, endDate = NULL,
+get_any <- function(aoi, image_type = "ImageCollection", method, param = NULL, stat = "median", startDate = NULL, endDate = NULL,
                         mask = FALSE, m.low = NULL, m.high = NULL, c.low = NULL, c.high = NULL){
 
 
@@ -674,7 +674,7 @@ get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat 
   aoi <- aoi %>% sf::st_transform(crs = 4326, proj4string = "+init=epsg:4326")
   geom <- setup(aoi)
 
-  if(i_type == 'ImageCollection') {
+  if(image_type == 'ImageCollection') {
 
   col = rgee::ee$ImageCollection(method)$filterBounds(geom)
 
@@ -696,7 +696,7 @@ get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat 
 
   data <- data_stat(col, stat)
 
-  } else if (i_type == 'Image'){
+  } else if (image_type == 'Image'){
 
     if(!is.null(param)){
 
@@ -722,13 +722,13 @@ get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat 
 
   }
 
-  any_list <- list(imageCol = col, data = data, geom = geom, method = method, param = param, stat = stat,
+  any_list <- list(imageCol = col, image = data, geom = geom, method = method, param = param, stat = stat,
                        startDate = startDate, endDate = endDate, c.low = c.low, c.high = c.high, mask = mask,
                        m.low = m.low, m.high = m.high,
                        aoi = aoi,
                        bbox = as.numeric(sf::st_bbox(aoi)))
 
-  class(any_list) = "any_list"
+  class(any_list) = c("any_list", "exploreList")
   return(any_list)
 
 }
@@ -764,7 +764,7 @@ get_any <- function(aoi, i_type = "ImageCollection", method, param = NULL, stat 
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -841,18 +841,18 @@ get_nex <- function(aoi, method = 'ensemble', scenario = 'rcp85', model = 'ACCES
 
   }
 
-  any_list <- list(imageCol = col, data = data, geom = geom, method = method, param = param, stat = stat,
+  any_list <- list(imageCol = col, image = data, geom = geom, method = method, param = param, stat = stat,
                    startDate = startDate, endDate = endDate, c.low = c.low, c.high = c.high, mask = mask,
                    m.low = m.low, m.high = m.high,
                    aoi = aoi,
                    bbox = as.numeric(sf::st_bbox(aoi)))
 
-  class(any_list) = "nex_list"
+  class(any_list) = c("nex_list", "exploreList")
   return(any_list)
 
 }
 
-#' Get Image Difference
+#' Get Linear Regression
 #' @description This function allows the user to get a linearFit() from an ImageCollection.
 #' @param data A previously create get_* object.
 #' @param band A \code{character} indicating what bands/type to use when you have more than one. Can \strong{only} select one, e.g. 'NDVI'.
@@ -865,7 +865,7 @@ get_nex <- function(aoi, method = 'ensemble', scenario = 'rcp85', model = 'ACCES
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -883,7 +883,7 @@ get_nex <- function(aoi, method = 'ensemble', scenario = 'rcp85', model = 'ACCES
 #' lr %>% viz(band = 'scale')
 #' }
 
-get_linear <- function(data, method = 'lfit', band = NULL, stat = 'median', temporal = 'yearly'){
+get_linear <- function(data, band = NULL, stat = 'median', temporal = 'yearly'){
 
   if(missing(data))stop({"Need a previously created get_* object as 'data'."})
 
@@ -913,15 +913,12 @@ get_linear <- function(data, method = 'lfit', band = NULL, stat = 'median', temp
 
   if (temporal == 'yearly'){
 
-      collection <- year_filter(startDate = startDate, endDate = endDate,
-                            imageCol = collection, stat = stat)
+      collection <- ee_year_filter(imageCol = collection, stat = stat)
       ind_dep <- c('system:time_start', param)
 
   } else if (temporal == 'year_month'){
 
-    collection <- year_month_filter(startDate = startDate, endDate = endDate,
-                                    imageCol = collection, stat = stat, c.low = c.low,
-                                    c.high = c.high)
+    collection <- ee_year_month_filter(imageCol = collection, stat = stat)
     ind_dep <- c(paste0('system:time_start_',stat), paste0(param, '_',stat))
 
   } else {
@@ -933,11 +930,11 @@ get_linear <- function(data, method = 'lfit', band = NULL, stat = 'median', temp
 
   trend <- collection$select(ind_dep)$reduce(ee$Reducer$linearFit())
 
-  linear_list <- list(imageCol = collection, data = trend, geom = geom, method = method, param = NULL, stat = stat,
+  linear_list <- list(imageCol = collection, image = trend, geom = geom, method = 'lfit', param = NULL, stat = stat,
                     startDate = startDate, endDate = endDate,c.low = c.low, c.high = c.high,
                     bbox = as.numeric(sf::st_bbox(aoi)), aoi = aoi)
 
-  class(linear_list) = "linear_list"
+  class(linear_list) = c("linear_list", "exploreList")
   return(linear_list)
 
 }

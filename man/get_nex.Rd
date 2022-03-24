@@ -70,7 +70,7 @@ what scenario! Some scenarios and models don't jive so do your research.
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

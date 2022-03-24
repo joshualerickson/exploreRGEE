@@ -64,7 +64,7 @@ The methods currently available:
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

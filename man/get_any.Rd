@@ -6,7 +6,7 @@
 \usage{
 get_any(
   aoi,
-  i_type = "ImageCollection",
+  image_type = "ImageCollection",
   method,
   param = NULL,
   stat = "median",
@@ -22,7 +22,7 @@ get_any(
 \arguments{
 \item{aoi}{A sf object indicating the extent of the geom.}
 
-\item{i_type}{A \code{character} indicating what type of image, e.g. 'ImageCollection' or 'Image'.}
+\item{image_type}{A \code{character} indicating what type of image, e.g. 'ImageCollection' or 'Image'.}
 
 \item{method}{A \code{character} indicating what imageCollection to use, e.g. "UMD/hansen/global_forest_change_2019_v1_7".}
 
@@ -58,7 +58,7 @@ Use how you would normally call a GEE session online but with method as your col
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data
@@ -66,7 +66,7 @@ huc <- exploreRGEE::huc
 
 # get any Image or ImageCollection
 
-forest_cover_loss <- get_any(huc, i_type = "Image",
+forest_cover_loss <- get_any(huc, image_type = "Image",
                              method = 'UMD/hansen/global_forest_change_2019_v1_7',
                              param = 'lossyear')
 }

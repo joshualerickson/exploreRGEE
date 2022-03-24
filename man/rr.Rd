@@ -61,7 +61,7 @@ is used when applying a non-get_*() function to rr(); this means you can provide
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

@@ -2,15 +2,9 @@
 % Please edit documentation in R/get.R
 \name{get_linear}
 \alias{get_linear}
-\title{Get Image Difference}
+\title{Get Linear Regression}
 \usage{
-get_linear(
-  data,
-  method = "lfit",
-  band = NULL,
-  stat = "median",
-  temporal = "yearly"
-)
+get_linear(data, band = NULL, stat = "median", temporal = "yearly")
 }
 \arguments{
 \item{data}{A previously create get_* object.}
@@ -33,7 +27,7 @@ This function allows the user to get a linearFit() from an ImageCollection.
 # Load Libraries
 
 library(rgee)
-rgee::ee_intialize()
+ee_Initialize()
 library(exploreRGEE)
 
 # Bring in data

@@ -24,7 +24,7 @@
 #' # Load Libraries
 #'
 #' library(rgee)
-#' rgee::ee_intialize()
+#' ee_Initialize()
 #' library(exploreRGEE)
 #'
 #' # Bring in data
@@ -65,7 +65,7 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
   } else {
 
   aoi <- data$aoi
-  image <- data$data
+  image <- data$image
   geom <- data$geom
   stat <- data$stat
   method <- data$method
@@ -122,24 +122,6 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
       dplyr::mutate(dplyr::across(c('max', 'mean', 'median', 'min','stdDev', 'sum'), as.numeric))
 
   if(leaflet == "TRUE") {
-
-    # # this is subjective and could be axed for sure.
-    #
-    # website <- function(){
-    #
-    #   if (class(data) == "landsat_list"){
-    #
-    #     '<a href = "https://www.usgs.gov/core-science-systems/nli/landsat/landsat-surface-reflectance-quality-assessment?qt-science_support_page_related_con=0#qt-science_support_page_related_con"> More Info </a>'
-    #
-    #     } else if (class(data) == "met_list" & method %in% c('AN81m', 'AN81d', 'Norm81m')){
-    #
-    #     '<a href = "https://prism.oregonstate.edu/documents/PRISM_datasets.pdf"> More Info </a>'
-    #
-    #     } else if (class(data) == "met_list" & method == 'GRIDMET'){
-    #
-    #       '<a href = "https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.3413"> More Info </a>'
-    #     }
-    # }
 
     if(class(region_df$geometry[[1]])[[2]] != "POINT") {
 

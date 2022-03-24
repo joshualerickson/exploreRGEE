@@ -26,6 +26,29 @@ reducers <-  function() {
 )
 }
 
+reducers_min_max <- function(image, geom, scale) {
+
+  reducers <- rgee::ee$Reducer$min()$combine(
+  reducer2 = rgee::ee$Reducer$max(),
+  sharedInputs = TRUE)
+
+if(is.null(geom)){
+
+c(0,1)
+
+} else {
+
+stats <- image$reduceRegions(
+  reducer = reducers,
+  collection = geom,
+  scale = scale)
+
+min <- stats$getInfo()$features[[1]]$properties$min
+max <- stats$getInfo()$features[[1]]$properties$max
+
+c(min,max)
+}
+}
 
 
 
@@ -78,39 +101,19 @@ geeFC_setup <- function(aoi, geeFC){
 
 # function for determining what reducer/stat to use
 
-data_stat <- function(data,stat){
+data_stat <- function(x,stat){
+  switch(stat,
 
-  if(stat == "median"){
-
-    data$median()
-
-  } else if (stat == "mean") {
-
-    data$mean()
-
-  } else if (stat == "max") {
-
-    data$max()
-
-  } else if (stat == "min") {
-
-    data$min()
-
-  } else if (stat == "sum"){
-
-    data$sum()
-
-  } else if (stat == "stdDev"){
-
-    data$reduce(ee$Reducer$stdDev())
-
-  } else if (stat == 'first'){
-
-    data$first()
-
+          "mean" = x$reduce(ee$Reducer$mean()),
+          "max" = x$reduce(ee$Reducer$max()),
+          "min" = x$reduce(ee$Reducer$min()),
+          "median"= x$reduce(ee$Reducer$median()),
+          "sum"= x$reduce(ee$Reducer$stdDev()),
+          "sd" =  x$reduce(ee$Reducer$stdDev()),
+          "first" = x$reduce(ee$Reducer$first()),
+          NULL
+  )
   }
-
-}
 
 
 
@@ -151,6 +154,73 @@ class_type <- function(data, aoi, method, param, stat,
             m.low = m.low, m.high = m.high)
 
   }
+}
+
+stat_to_reducer <-  function(x){switch(x,
+                                       "mean" = function(x)x$reduce(ee$Reducer$mean()),
+                                       "max" = function(x)x$reduce(ee$Reducer$max()),
+                                       "min" = function(x)x$reduce(ee$Reducer$min()),
+                                       "median"= function(x)x$reduce(ee$Reducer$median()),
+                                       "sum"= function(x)x$reduce(ee$Reducer$sum()),
+                                       "sd" =  function(x)x$reduce(ee$Reducer$stdDev()),
+                                       "first" = x$reduce(ee$Reducer$first()),
+                                       NULL
+
+)
+}
+
+
+
+
+#' Leaflet basemap
+#'
+#' @return A leaflet map with common basemaps ("Esri.WorldImagery","CartoDB.Positron", "OpenStreetMap",
+#' "CartoDB.DarkMatter",
+#' "OpenTopoMap")
+
+viz_A <- function() {
+
+
+  grp <- c( "Esri.WorldImagery","CartoDB.Positron", "OpenStreetMap",
+            "CartoDB.DarkMatter",
+            "OpenTopoMap", "Hydrography")
+
+  att <- paste0("<a href='https://www.usgs.gov/'>",
+                "U.S. Geological Survey</a> | ",
+                "<a href='https://www.usgs.gov/laws/policies_notices.html'>",
+                "Policies</a>")
+
+  GetURL <- function(service, host = "basemap.nationalmap.gov") {
+    sprintf("https://%s/arcgis/services/%s/MapServer/WmsServer", host, service)
+  }
+
+  map <- leaflet::leaflet()
+
+  map <- leaflet::addProviderTiles(map = map, provider = grp[[1]],
+                                   group = grp[[1]])
+  map <- leaflet::addProviderTiles(map = map, provider = grp[[2]],
+                                   group = grp[[2]])
+  map <- leaflet::addProviderTiles(map = map, provider = grp[[3]],
+                                   group = grp[[3]])
+  map <- leaflet::addProviderTiles(map = map, provider = grp[[4]],
+                                   group = grp[[4]])
+  map <- leaflet::addProviderTiles(map = map, provider = grp[[5]],
+                                   group = grp[[5]])
+
+  opt <- leaflet::WMSTileOptions(format = "image/png", transparent = TRUE)
+  map <- leaflet::addWMSTiles(map, GetURL("USGSHydroCached"),
+                              group = grp[6], options = opt, layers = "0",
+                              attribution = att)
+
+  map <- leaflet::hideGroup(map, grp[6])
+
+  opt <- leaflet::layersControlOptions(collapsed = TRUE)
+
+  map <- leaflet::addLayersControl(map, baseGroups = grp[1:5],
+                                   overlayGroups = grp[6], options = opt)
+  map %>%
+    leafem::addMouseCoordinates(epsg = "EPSG:4326", proj4string = "+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+
 }
 
 

@@ -2,10 +2,15 @@ Package: exploreRGEE
 Title: Explores Google Earth Engine
 Version: 0.1
 Authors@R: 
-    person(given = "Josh",
+    c(person(given = "Josh",
            family = "Erickson",
            role = c("aut", "cre"),
-           email = "joshualerickson@gmail.com")
+           email = "joshualerickson@gmail.com"),
+      person(given = "Zack",
+             family = "Arno",
+             role = "aut",
+             email = zackarno@gmail.com))
+             
 Description: This package uses rgee and other spatial packages (sf, leaflet) to explore Google Earth Engine collections in a exploratory data analysis manner using R.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -31,7 +36,7 @@ Imports:
     plyr,
     leaflet.extras,
     mapview, 
-    geojsonio,
+    geojsonio,`
     glue
 Depends: 
     R (>= 2.10)

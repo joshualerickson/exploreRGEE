@@ -9,7 +9,7 @@ Authors@R:
       person(given = "Zack",
              family = "Arno",
              role = "aut",
-             email = zackarno@gmail.com))
+             email = "zackarno@gmail.com"))
 Description: This package uses rgee and other spatial packages (sf, leaflet) to explore Google Earth Engine collections in a exploratory data analysis manner using R.
 License: MIT + file LICENSE
 Encoding: UTF-8

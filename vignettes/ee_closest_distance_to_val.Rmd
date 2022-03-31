@@ -1,0 +1,19 @@
+---
+title: "ee_closest_distance_to_val"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ee_closest_distance_to_val}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(exploreRGEE)
+```

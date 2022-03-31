@@ -224,3 +224,31 @@ viz_A <- function() {
 }
 
 
+# maybe we should add all switch functions dowm here. I think there are a couple floating around
+
+
+#' switch boolean
+#' @description switch R-syntax boolean conditions to GEE javaScript language. Useful allowing users to specify
+#' masking values in custom functions - currently made fore use in ee_closest_distance_to_val
+#' @param boolean_cond \code{character} representation of logical condition following typical R syntax (">",">=")
+#' @param val \code{numeric} value for condition to operate on.
+#' @return JavaScript-based function for boolean masking
+#' @examples \dontrun{
+#' library(rgee)
+#' ee_initialize()
+#' switch_boolean(boolean_cond = ">",val=2)
+#' }
+
+switch_boolean <-  function(boolean_cond,val){switch(boolean_cond,
+                                                ">" = function(x)x$gt(val),
+                                                ">=" = function(x)x$gte(val),
+                                                "<" = function(x)x$lt(val),
+                                                "<=" = function(x)x$lte(val),
+                                                "=" = function(x)x$eq(val),
+                                                NULL
+
+)
+}
+
+
+

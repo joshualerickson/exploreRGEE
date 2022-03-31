@@ -129,6 +129,92 @@ ee_timeseries.ee.imagecollection.ImageCollection <- function(imageCol,
 }
 
 
+ee_timeseries.ee.image.Image<- function(imageCol,
+                                        geom,
+                                        geeFC = NULL,
+                                        scale,
+                                        temporal = 'yearly',
+                                        temporal_stat = 'mean',
+                                        reducer = 'mean',
+                                        lazy = FALSE,
+                                        startDate = NULL,
+                                        endDate = NULL,
+                                        months = NULL,
+                                        ...){
+
+  # error catching
+  if(missing(imageCol)){stop("Need a get_* object or ImageCollection to use this function")}
+
+  # if(any(class(imageCol) == 'diff_list' | class(imageCol) == 'terrain_list' | class(imageCol) == 'ee.image.Image')){stop("Can't band with this type of list")}
+
+  # if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correct temporal argument")}
+
+  stopifnot(!is.null(imageCol), inherits(imageCol, "ee.image.Image"))
+
+  if( "ee.image.Image" %in% class(imageCol)){
+    cat(crayon::green("As imageCol is actually an ee$Image rather than ee$ImageCollection exact values will be extracted without compositing"))
+    temporal <- "all"
+  }
+
+  if(temporal == 'yearly'){
+
+    imageCol <- ee_year_filter(imageCol = imageCol,startDate = startDate, endDate = endDate, stat = temporal_stat)
+
+  } else if (temporal == 'monthly'){
+
+    imageCol <- ee_month_filter(imageCol = imageCol, months = months, stat = temporal_stat)
+
+  } else if (temporal == 'year_month') {
+
+    imageCol <- ee_year_month_filter(imageCol = imageCol,startDate = startDate, endDate = endDate,months = months,  stat = temporal_stat)
+
+  } else if (temporal == 'all'){
+
+  }
+
+  if(is.null(geeFC)) {
+
+    reg <- sf_setup(geom)
+
+  } else {
+
+    if (isTRUE(lazy)){
+
+    reg <- geeFC_setup_aoi(geom, geeFC)
+
+    } else {
+
+    reg <- geeFC_setup(geom, geeFC)
+
+  }}
+
+  if(isTRUE(lazy)){
+    prev_plan <- future::plan(future::sequential, .skip = TRUE)
+    on.exit(future::plan(prev_plan, .skip = TRUE), add = TRUE)
+    future::future({
+
+      extract_time(imageCol = imageCol,
+                reg = reg,
+                scale = scale,
+                reducer = reducer,
+                ...
+      )
+    }, lazy = TRUE)
+
+  } else {
+
+    extract_time(imageCol = imageCol,
+              reg = reg,
+              scale = scale,
+              reducer = reducer,
+              ...
+              )
+
+  }
+
+}
+
+
 
 #' @name ee_timeseries
 #' @param ... extra args to pass on

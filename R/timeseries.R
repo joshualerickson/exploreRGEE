@@ -322,7 +322,15 @@ extract_time <- function(imageCol, reg, reducer, scale,...){
                               scale = scale,
                               ...)
   # client side
+  # can't run `first()` on image so need the if statement
+  # @ josh-  is it better to use `inherits` inside of ifs? instead of x %in% class(y)
+  if("ee.image.Image" %in% class(imageCol)){
+    band_names_cli<- imageCol$bandNames()$getInfo()
+  }
+
+  if("ee.imagecollection.ImageCollection" %in% class(imageCol)){
   band_names_cli<- imageCol$first()$bandNames()$getInfo()
+  }
 
   # regex to be removed from name to create date col
   rm_rgx <- paste0(".*",band_names_cli)
@@ -345,12 +353,22 @@ extract_time <- function(imageCol, reg, reducer, scale,...){
     select(-.data$.names)
 }
 
+
+
+
+
+map_date_to_bandname_ic <- function(ic, ...) {
+
+  UseMethod('map_date_to_bandname_ic')
+}
+
+
 #' @title map_date_to_bandname_ic
 #' @description Slick helper function by Zack that get's the names
 #' of the bands as well as the date.
 #' @param ic ee ImageCollection
 #'
-map_date_to_bandname_ic <- function(ic){
+map_date_to_bandname_ic.ee.imagecollection.ImageCollection <- function(ic){
   ic |>
     ee$ImageCollection$map(
       function(x){
@@ -370,6 +388,19 @@ map_date_to_bandname_ic <- function(ic){
       }
 
     )
+
+}
+
+map_date_to_bandname_ic.ee.image.Image <- function(ic){
+  bnames<- ic$bandNames()
+  date <- ee$Date(ic$get("system:time_start"))$format('YYYY_MM_dd')
+  bnames_date <- bnames$map(
+    rgee::ee_utils_pyfunc(function(x){
+      ee$String(x)$cat(ee$String("_"))$cat(date)
+
+    })
+  )
+  ic$select(bnames)$rename(bnames_date)
 
 }
 

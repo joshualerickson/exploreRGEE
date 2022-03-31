@@ -45,7 +45,7 @@ ee_closest_distance_to_val.ee.imagecollection.ImageCollection <-  function(x,
                                                                            y,
                                                                            boolean_cond="=",
                                                                            val=2,
-                                                                           scale
+                                                                           scale=30
 ){
 
   # stopifnot(!is.null(x), inherits(x, "ee.imagecollection.ImageCollection"))
@@ -77,7 +77,7 @@ ee_closest_distance_to_val.ee.imagecollection.ImageCollection <-  function(x,
       }
     )
   cat(crayon::green("Extracting distance raster values to y\n"))
-  res <- exploreRGEE::ee_timeseries(imageCol = euclidean_distance_to_x$select("distance_to"),geom=y,temporal="all",scale=30)
+  res <- exploreRGEE::ee_timeseries(imageCol = euclidean_distance_to_x$select("distance_to"),geom=y,temporal="all",scale=scale)
   return(res)
 }
 
@@ -86,7 +86,7 @@ ee_closest_distance_to_val.ee.image.Image<-  function(x,
                                                       y,
                                                       boolean_cond="=",
                                                       val=2,
-                                                      scale
+                                                      scale=30
 ){
 
   # stopifnot(!is.null(x), inherits(x, "ee.imagecollection.ImageCollection"))
@@ -116,6 +116,6 @@ ee_closest_distance_to_val.ee.image.Image<-  function(x,
   euclidean_distance_to_x <-ee$Image(distances$copyProperties(x_masked,x_masked$propertyNames()))
 
   cat(crayon::green("Extracting distance raster values to y\n"))
-  res <- exploreRGEE::ee_timeseries(imageCol = euclidean_distance_to_x$select("distance_to"),geom=y,temporal="all",scale=30)
+  res <- exploreRGEE::ee_timeseries(imageCol = euclidean_distance_to_x$select("distance_to"),geom=y,temporal="all",scale=scale)
   return(res)
 }

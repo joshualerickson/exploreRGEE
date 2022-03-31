@@ -129,6 +129,92 @@ ee_timeseries.ee.imagecollection.ImageCollection <- function(imageCol,
 }
 
 
+ee_timeseries.ee.image.Image<- function(imageCol,
+                                        geom,
+                                        geeFC = NULL,
+                                        scale,
+                                        temporal = 'yearly',
+                                        temporal_stat = 'mean',
+                                        reducer = 'mean',
+                                        lazy = FALSE,
+                                        startDate = NULL,
+                                        endDate = NULL,
+                                        months = NULL,
+                                        ...){
+
+  # error catching
+  if(missing(imageCol)){stop("Need a get_* object or ImageCollection to use this function")}
+
+  # if(any(class(imageCol) == 'diff_list' | class(imageCol) == 'terrain_list' | class(imageCol) == 'ee.image.Image')){stop("Can't band with this type of list")}
+
+  # if(!temporal %in% c('yearly', 'monthly', 'year_month', 'all')){stop("Need correct temporal argument")}
+
+  stopifnot(!is.null(imageCol), inherits(imageCol, "ee.image.Image"))
+
+  if( "ee.image.Image" %in% class(imageCol)){
+    cat(crayon::green("As imageCol is actually an ee$Image rather than ee$ImageCollection exact values will be extracted without compositing"))
+    temporal <- "all"
+  }
+
+  if(temporal == 'yearly'){
+
+    imageCol <- ee_year_filter(imageCol = imageCol,startDate = startDate, endDate = endDate, stat = temporal_stat)
+
+  } else if (temporal == 'monthly'){
+
+    imageCol <- ee_month_filter(imageCol = imageCol, months = months, stat = temporal_stat)
+
+  } else if (temporal == 'year_month') {
+
+    imageCol <- ee_year_month_filter(imageCol = imageCol,startDate = startDate, endDate = endDate,months = months,  stat = temporal_stat)
+
+  } else if (temporal == 'all'){
+
+  }
+
+  if(is.null(geeFC)) {
+
+    reg <- sf_setup(geom)
+
+  } else {
+
+    if (isTRUE(lazy)){
+
+    reg <- geeFC_setup_aoi(geom, geeFC)
+
+    } else {
+
+    reg <- geeFC_setup(geom, geeFC)
+
+  }}
+
+  if(isTRUE(lazy)){
+    prev_plan <- future::plan(future::sequential, .skip = TRUE)
+    on.exit(future::plan(prev_plan, .skip = TRUE), add = TRUE)
+    future::future({
+
+      extract_time(imageCol = imageCol,
+                reg = reg,
+                scale = scale,
+                reducer = reducer,
+                ...
+      )
+    }, lazy = TRUE)
+
+  } else {
+
+    extract_time(imageCol = imageCol,
+              reg = reg,
+              scale = scale,
+              reducer = reducer,
+              ...
+              )
+
+  }
+
+}
+
+
 
 #' @name ee_timeseries
 #' @param ... extra args to pass on
@@ -236,7 +322,15 @@ extract_time <- function(imageCol, reg, reducer, scale,...){
                               scale = scale,
                               ...)
   # client side
+  # can't run `first()` on image so need the if statement
+  # @ josh-  is it better to use `inherits` inside of ifs? instead of x %in% class(y)
+  if("ee.image.Image" %in% class(imageCol)){
+    band_names_cli<- imageCol$bandNames()$getInfo()
+  }
+
+  if("ee.imagecollection.ImageCollection" %in% class(imageCol)){
   band_names_cli<- imageCol$first()$bandNames()$getInfo()
+  }
 
   # regex to be removed from name to create date col
   rm_rgx <- paste0(".*",band_names_cli)
@@ -259,12 +353,22 @@ extract_time <- function(imageCol, reg, reducer, scale,...){
     select(-.data$.names)
 }
 
+
+
+
+
+map_date_to_bandname_ic <- function(ic, ...) {
+
+  UseMethod('map_date_to_bandname_ic')
+}
+
+
 #' @title map_date_to_bandname_ic
 #' @description Slick helper function by Zack that get's the names
 #' of the bands as well as the date.
 #' @param ic ee ImageCollection
 #'
-map_date_to_bandname_ic <- function(ic){
+map_date_to_bandname_ic.ee.imagecollection.ImageCollection <- function(ic){
   ic |>
     ee$ImageCollection$map(
       function(x){
@@ -284,6 +388,19 @@ map_date_to_bandname_ic <- function(ic){
       }
 
     )
+
+}
+
+map_date_to_bandname_ic.ee.image.Image <- function(ic){
+  bnames<- ic$bandNames()
+  date <- ee$Date(ic$get("system:time_start"))$format('YYYY_MM_dd')
+  bnames_date <- bnames$map(
+    rgee::ee_utils_pyfunc(function(x){
+      ee$String(x)$cat(ee$String("_"))$cat(date)
+
+    })
+  )
+  ic$select(bnames)$rename(bnames_date)
 
 }
 

@@ -42,7 +42,8 @@ Depends:
 Suggests: 
     knitr,
     AOI,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    rmarkdown
 URL: https://github.com/joshualerickson/exploreRGEE
 BugReports: https://github.com/joshualerickson/exploreRGEE/issues
 VignetteBuilder: knitr

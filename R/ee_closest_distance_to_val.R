@@ -42,21 +42,21 @@ ee_closest_distance_to_val.ee.imagecollection.ImageCollection <-  function(x,
       }
     )
   cat(crayon::green("Extracting distance raster values to y\n"))
-  res <- exploreRGEE::ee_timeseries(imageCol = euclidean_distance_to_x$select("distance_to"),geom=sf,temporal="all",scale=30)
+  res <- exploreRGEE::ee_timeseries(imageCol = euclidean_distance_to_x$select("distance_to"),geom=y,temporal="all",scale=30)
   return(res)
 }
 
-JRC_example$first() |> class()
+
 ee_closest_distance_to_val.ee.image.Image<-  function(x,
                                                       y,
-                                                      boolean="=",
+                                                      boolean_cond="=",
                                                       val=2,
                                                       scale
 ){
 
   # stopifnot(!is.null(x), inherits(x, "ee.imagecollection.ImageCollection"))
   assertthat:::assert_that(!is.null(x), inherits(x, "ee.image.Image"))
-  boolean_mask_cond<-switch_boolean(boolean=boolean,val=val)
+  boolean_mask_cond<-switch_boolean(boolean_cond=boolean_cond,val=val)
 
   # if(is.numeric(val)){}
   cat(crayon::green("masking x image/imageCollection\n"))
@@ -81,6 +81,6 @@ ee_closest_distance_to_val.ee.image.Image<-  function(x,
   euclidean_distance_to_x <-ee$Image(distances$copyProperties(x_masked,x_masked$propertyNames()))
 
   cat(crayon::green("Extracting distance raster values to y\n"))
-  res <- exploreRGEE::ee_timeseries(imageCol = euclidean_distance_to_x$select("distance_to"),geom=sf,temporal="all",scale=30)
+  res <- exploreRGEE::ee_timeseries(imageCol = euclidean_distance_to_x$select("distance_to"),geom=y,temporal="all",scale=30)
   return(res)
 }

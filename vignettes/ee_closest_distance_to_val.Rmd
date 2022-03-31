@@ -16,4 +16,107 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(exploreRGEE)
+library(mapedit)
+library(rgee)
+library(ggplot2)
+library(leaflet)
+library(sf)
+library(tmap)
+rgee::ee_Initialize()
+```
+
+
+# Get data
+
+- make some fake point data
+- load in and temporally filter JRC yearly water data
+
+```{r}
+#DRAW SOME FAKE HH DATA
+aoi <- drawFeatures()
+
+
+
+#GET YEARLY WATER OCCURENCE IMAGE COLLECTION FROM GEE - JRC
+water_yearly <- rgee::ee$ImageCollection("JRC/GSW1_3/YearlyHistory")
+
+# FILTER DATES 2000-2019
+water_years_filtered <- water_yearly$
+  filterDate("2000-01-01","2019-12-31")
+
+```
+
+# Process
+- Now use `ee_closest_distance_to_val` to calculate the distance from each point the closest water pixel
+- since 2 is seasonal and 3 is permanent we can specify `boolean_cond` as `>=` 2 and to consider all water pixels
+```{r}
+# 2 is seasonal, 3 is permanent
+# so if we specify >= 2 we get all water 
+distance_to_water <- ee_closest_distance_to_val(x = water_years_filtered,
+                                                          y = aoi,
+                                                          boolean_cond = ">=",
+                                                          val = 2,
+                                                          scale = 30)
+```
+
+# Plot results
+```{r}
+distance_to_water |> 
+  ggplot(aes(x=value,y=factor(date)))+
+  geom_boxplot()
+
+# plot is showing distribution of CLOSEST distance values for each year
+
+
+```
+
+# Potential wrapper
+
+- when making the above function I specifically had the JRC yearly water ImageCollection in mind. Therefore,
+a potential convenience wrapper could be made something like below.
+- now I am thining this could be useful for landcover as well (i.e closest cropland)
+
+
+```{r}
+
+
+
+
+ee_distance_to_JRC_yearly_water <- function(x, y,water_type="all",scale=30){
+  res <- list()
+  boolean_input <-  switch(water_type,
+         "all"=">=",
+         "seasonal"="=",
+         "permanent"="="
+         )
+  val_input <-  switch(water_type,
+         "all"=2,
+         "seasonal"=2,
+         "permanent"=3
+         )
+  ee_closest_distance_to_val(x = x,
+                           y = y,
+                           boolean_cond = boolean_input,
+                           val = val_input,
+                           scale = scale)
+  
+  
+}
+```
+
+- wrapper works
+```{r}
+
+
+  
+dist_to_water <-  ee_distance_to_JRC_yearly_water(x = water_years_filtered,
+                                y = aoi,
+                                water_type = "all"
+                                )
+
+
+
+
+
+
 ```

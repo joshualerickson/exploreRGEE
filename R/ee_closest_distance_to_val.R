@@ -1,9 +1,44 @@
+#' ee_closest_distance_to_val
+#' @param x ee$Image or ee$ImageCollection
+#' @param y ee$Geometry$*, ee$Feature, ee$FeatureCollection, sfc or sf objects.
+#' @param val \code{numeric} pixel value of interest
+#' @param scale \code{numeric} scale in meters
+#' @return data.frame containg y with closest distance column ("distance_to") containing
+#' closest distance to pixel value specified for each record.
+#' @export
+#' @examples \dontrun{
+#'
+#' # Load Libraries
+#'
+#' library(rgee)
+#' library(tidyverse)
+#' library(sf)
+#' ee_Initialize()
+#' library(exploreRGEE)
+#'
+#' # Bring in data
+#' huc <- exploreRGEE::huc |> st_centroid()
+#' #GET YEARLY WATER OCCURENCE IMAGE COLLECTION FROM GEE - JRC
+#' water_yearly <- rgee::ee$ImageCollection("JRC/GSW1_3/YearlyHistory")
+#' # FILTER DATES 2000-2019
+#' water_years_filtered <- water_yearly$
+#'  filterDate("2000-01-01","2019-12-31")
+#'
+#' distance_to_water <- ee_closest_distance_to_val(x = water_years_filtered,
+#'                                                  y = aoi,
+#'                                                  boolean_cond = ">=",
+#'                                                  val = 2,
+#'                                                  scale = 30)
+#'
+#' }
 
 ee_closest_distance_to_val <-  function(x,...){
   UseMethod('ee_closest_distance_to_val')
 
 
 }
+
+
 
 
 ee_closest_distance_to_val.ee.imagecollection.ImageCollection <-  function(x,

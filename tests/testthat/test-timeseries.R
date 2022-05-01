@@ -42,15 +42,13 @@ test_that("timeseries with ee ImageCollection", {
 
   #all
   # all data at 2 months, 1 years, 12 bands, 2 polygons/features
-  ld8_band <- ee_timeseries(imageCol, scale = 250,
+  eets <- purrr::quietly(ee_timeseries)
+  ld8_band <- eets(imageCol, scale = 250,
                             geom = huc, startDate = '2018-01-01',
                             endDate = '2018-12-31', temporal = 'all',months = c(8,9))
 
-  expect_equal(nrow(ld8_band), 4170)
+  expect_equal(nrow(ld8_band$result), 96)
 
-  expect_error(ld8_band[1,]$date, NA)
-
-  expect_equal(ld8_band[1,]$parameter, 'B10')
 
 })
 

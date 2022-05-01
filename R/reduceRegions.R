@@ -9,14 +9,13 @@
 #' @param lazy \code{logical} whether to run a 'sequential' future in the background or not.
 #' @param variable \code{character} indicating what to label features in leaflet map, optional. NULL (default)
 #' @param leaflet \code{logical}. TRUE/FALSE whether to view map. FALSE (default).
-#' @param palette \code{character} color palette using colorBrewer format, e.g. "RdBu" (default), "RdYlGn", etc.
-#' @param n_pal \code{numeric} indicating levels of colors in palette. 6 (default).
-#' @param reverse \code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).
+#' @param palette \code{character} color palette. ex hcl.colors('Zissou1', n = 11).
 #' @param user_geom A sf object to use as 'region' for an 'ee.image.Image'.
 #' @note If lazy is TRUE, the function will be run in the background. If the pixel size is big then please adjust tileScale
 #' to account for memory. This will not effect zonal stats (pixel size) but will just take longer. user_geom in this function
 #' is used when applying a non-get_*() function to rr(); this means you can provide a 'ee.image.Image' and a sf object to run rr().
 #' @importFrom rgee ee Map
+#' @importFrom grDevices hcl.colors
 #' @return A leaflet map (leaflet = TRUE) and always a sf object.
 #' @export
 #'
@@ -43,7 +42,10 @@
 #' ld8_ts <- ld8 %>% band(scale = 500, band = 'NDVI', leaflet = TRUE, variable = 'name')
 #'
 #' }
-rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FALSE, variable = NULL, leaflet = FALSE, palette = "RdBu", n_pal = 11, reverse = FALSE, user_geom = NULL){
+rr <- function(data, geeFC = NULL, scale, tileScale = 1,
+              band = NULL, lazy = FALSE, variable = NULL,
+              leaflet = FALSE, palette = hcl.colors(n = 11),
+              user_geom = NULL){
 
   if(missing(scale))stop({"Please provide a scale to reduce region(s)."})
   if(missing(data))stop({"Need a previously created get_* object as 'data'."})
@@ -125,7 +127,7 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
 
     if(class(region_df$geometry[[1]])[[2]] != "POINT") {
 
-      ldPal <- leaflet::colorNumeric(palette = Pal(palette, reverse, n_pal), region_df$mean)
+      ldPal <- leaflet::colorNumeric(palette = palette, region_df$mean)
 
       plot <-  viz_A() %>% leaflet::addPolygons(data = region_df, color = "black",
                                                 fillOpacity = .75,
@@ -145,7 +147,7 @@ rr <- function(data, geeFC = NULL, scale, tileScale = 1, band = NULL, lazy = FAL
 
     } else {
 
-      ldPal <- leaflet::colorNumeric(palette = Pal(palette, reverse, n_pal), region_df$mean)
+      ldPal <- leaflet::colorNumeric(palette = palette, region_df$mean)
       plot <-  viz_A() %>% leaflet::addCircleMarkers(data = region_df, color = "black",
                                                      fillOpacity = .75,
                                                      fillColor = ~ldPal(mean),

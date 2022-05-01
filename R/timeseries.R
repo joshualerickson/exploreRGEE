@@ -84,6 +84,8 @@ ee_timeseries.ee.imagecollection.ImageCollection <- function(imageCol,
 
   } else if (temporal == 'all'){
 
+    imageCol <- imageCol$filterDate(startDate, endDate)
+    imageCol <- imageCol$filter(ee$Filter$calendarRange(months[[1]], months[[2]], 'month'))
   }
 
   if(is.null(geeFC)) {

@@ -13,9 +13,7 @@ rr(
   lazy = FALSE,
   variable = NULL,
   leaflet = FALSE,
-  palette = "RdBu",
-  n_pal = 11,
-  reverse = FALSE,
+  palette = hcl.colors(n = 11),
   user_geom = NULL
 )
 }
@@ -36,11 +34,7 @@ rr(
 
 \item{leaflet}{\code{logical}. TRUE/FALSE whether to view map. FALSE (default).}
 
-\item{palette}{\code{character} color palette using colorBrewer format, e.g. "RdBu" (default), "RdYlGn", etc.}
-
-\item{n_pal}{\code{numeric} indicating levels of colors in palette. 6 (default).}
-
-\item{reverse}{\code{logical} TRUE/FALSE whether to reverse palette or not, FALSE (default).}
+\item{palette}{\code{character} color palette. ex hcl.colors('Zissou1', n = 11).}
 
 \item{user_geom}{A sf object to use as 'region' for an 'ee.image.Image'.}
 }

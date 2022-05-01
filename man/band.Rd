@@ -5,14 +5,14 @@
 \title{Extract Regions by Date}
 \usage{
 band(
-  data,
+  imageCol,
   geeFC = NULL,
   scale,
   band = NULL,
   temporal = "yearly",
-  stat = "median",
+  temporal_stat = "median",
   lazy = FALSE,
-  fun = ee$Reducer$median(),
+  reducer = "median",
   variable = NULL,
   ggplot = FALSE,
   save.plot = F,
@@ -24,7 +24,7 @@ band(
 )
 }
 \arguments{
-\item{data}{A previously created get_* object}
+\item{imageCol}{A previously created get_* object or ee.ImageCollection}
 
 \item{geeFC}{A known GEE FeatureCollection or asset, e.g. "USGS/WBD/2017/HUC12"}
 
@@ -34,17 +34,17 @@ band(
 
 \item{temporal}{A \code{character} indicating what temporal filter to use on the collection, e.g. 'yearly' (default), 'monthly', 'year_month', 'all'.}
 
-\item{stat}{A \code{character} indicating what to reduce the ImageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
+\item{temporal_stat}{A \code{character} indicating what to reduce the ImageCollection when using temporal filtering, e.g. 'median' (default), 'mean',  'max', 'min', 'sum', 'stdDev', 'first'.}
 
 \item{lazy}{\code{logical} whether to run a 'sequential' future in the background or not.}
 
-\item{fun}{A earth engine reducer, e.g. ee$Reducer$median() (default).}
+\item{reducer}{A \code{character} 'median' (default) for reducing.}
 
 \item{variable}{\code{character} indicating what to facet ggplot by. Need to know ahead of time.}
 
 \item{ggplot}{\code{logical} TRUE/FALSE. Whether to print side-effect ggplot. See details.}
 
-\item{save.plot}{\code{logical} TRUE/FALSE. Whether to save the plot in a list, e.g. data + ggplot.}
+\item{save.plot}{\code{logical} TRUE/FALSE. Whether to save the plot in a list.}
 
 \item{user_geom}{\code{logical} TRUE/FALSE.}
 
@@ -64,9 +64,10 @@ This function allows the user to pass a previously created get_*() object to get
 a time series from a collection, e.g. banding/toBands. This uses the \link[rgee]{ee_extract} function from rgee.
 }
 \note{
-Additional arguments to pass if using a ImageCollection without get_*()'s are the startDate, endDate, c.low and c.high arguments.
+If using a get_\emph{() object band() doesn't use the image generated. It only uses the ImageCollection.
+Additional arguments to pass if using a ImageCollection without get_}()'s are the startDate, endDate, c.low and c.high arguments.
 Faster with points or centroids of polygons.
-If lazy is TRUE, the function will be run in the background using a for-loop.
+If lazy is TRUE, the function will be run in the background.
 }
 \examples{
 \dontrun{
